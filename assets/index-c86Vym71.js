@@ -81,6 +81,7 @@ Error generating stack: `+l.message+`
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  max-width: 420px;
 `,Rm=Ht.div`
   display: flex;
   flex-direction: column;
@@ -96,6 +97,7 @@ Error generating stack: `+l.message+`
   letter-spacing: -0.24px;
   cursor: pointer;
   padding: 12px;
+  box-sizing: border-box;
   svg {
     width: 24px;
     height: 24px;
@@ -185,6 +187,7 @@ Error generating stack: `+l.message+`
   padding: 24px 0 0 0;
   min-height: 100vh;
   width: 100%;
+  max-width: 420px;
 `,wm=Ht.h1`
   font-family: "Instrument Serif", serif;
   font-size: 2.2rem;
@@ -211,7 +214,6 @@ Error generating stack: `+l.message+`
   z-index: 100;
 `,$m=Ht.div`
   width: 100%;
-  max-width: 420px;
   padding: 0 16px 32px 16px;
   box-sizing: border-box;
   pointer-events: all;
