@@ -1,5 +1,5 @@
 import {
-  BrowserRouter,
+  HashRouter,
   Routes,
   Route,
   useLocation,
@@ -7,19 +7,20 @@ import {
 } from "react-router-dom";
 import styled from "@emotion/styled";
 import BottomNav from "./components/BottomNav";
+import Trades from "./pages/Trades";
+import Strategies from "./pages/Strategies";
+import About from "./pages/About";
+import Refferal from "./pages/Referrals";
+import Main from "./pages/Main";
 
 const Wrapper = styled.div`
-  max-width: 420px;
-  margin: 0 auto;
   min-height: 100vh;
+  min-width: 100vw;
   display: flex;
   flex-direction: column;
-  background: #181818;
-`;
-
-const Content = styled.div`
-  flex: 1 1 auto;
-  padding-bottom: 96px; /* чтобы не перекрывалось меню */
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 `;
 
 const BottomNavWrapper = styled.div`
@@ -35,22 +36,20 @@ const BottomNavWrapper = styled.div`
 
 const BottomNavInner = styled.div`
   width: 100%;
-  max-width: 420px;
   padding: 0 16px 32px 16px;
   box-sizing: border-box;
   pointer-events: all;
 `;
 
-const pages = [
-  { path: "/main", label: "Main", element: <div>Main page</div> },
-  { path: "/trades", label: "Trades", element: <div>Trades page</div> },
+export const pages = [
+  { path: "/main", label: "Main", },
+  { path: "/trades", label: "Trades"},
   {
     path: "/strategies",
     label: "Strategies",
-    element: <div>Strategies page</div>,
   },
-  { path: "/about", label: "About", element: <div>About page</div> },
-  { path: "/refferal", label: "Refferal", element: <div>Refferal page</div> },
+  { path: "/about", label: "About" },
+  { path: "/refferal", label: "Refferal" },
 ];
 
 function AppRoutes() {
@@ -60,15 +59,15 @@ function AppRoutes() {
     pages.find((p) => location.pathname.startsWith(p.path))?.label || "Trades";
   return (
     <Wrapper>
-      <Content>
-        <Routes>
-          <Route path="/" element={<Navigate to="/trades" replace />} />
-          {pages.map((p) => (
-            <Route key={p.path} path={p.path} element={p.element} />
-          ))}
-          <Route path="*" element={<Navigate to="/trades" replace />} />
-        </Routes>
-      </Content>
+      <Routes>
+        <Route path="/" element={<Navigate to="/trades" replace />} />
+        <Route path="/main" element={<Main />} />
+        <Route path="/trades" element={<Trades />} />
+        <Route path="/strategies" element={<Strategies />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/refferal" element={<Refferal />} />
+        <Route path="*" element={<Navigate to="/trades" replace />} />
+      </Routes>
       <BottomNavWrapper>
         <BottomNavInner>
           <BottomNav active={active} />
@@ -80,8 +79,8 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <AppRoutes />
-    </BrowserRouter>
+    </HashRouter>
   );
 }
