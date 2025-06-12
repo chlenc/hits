@@ -18,7 +18,8 @@ const Input = styled.input`
   font-weight: 500;
   line-height: 110%; /* 30.8px */
   letter-spacing: -0.28px;
-
+  text-align: center;
+  
   /* слой 1 — заливка, слой 2 — градиент */
   background-image: linear-gradient(#000, #000),
     /* fill   */ linear-gradient(135deg, #19f096 0%, #6aacff 60%, #8f4af5 100%); /* border */

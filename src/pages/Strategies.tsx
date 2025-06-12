@@ -4,8 +4,10 @@ import chartUpIcon from "../assets/icons/chartUp.svg";
 import PageContainer from "../components/PageContainer";
 import PageTitle from "../components/PageTitle";
 import StrategyCard from "../components/StrategyCard";
+import { useNavigate } from "react-router-dom";
 
 const Strategies: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <PageContainer>
       <PageTitle>Select your strategy</PageTitle>
@@ -16,7 +18,7 @@ const Strategies: React.FC = () => {
         amount="120 000"
         asset="BTC"
         expiration="05.06.2025"
-        onInvest={() => alert("Invest")}
+        onInvest={() => navigate("/invest")}
         chartSrc={chartUpIcon}
       />
       <StrategyCard
@@ -26,7 +28,7 @@ const Strategies: React.FC = () => {
         amount="120 000"
         asset="BTC"
         expiration="05.06.2025"
-        onInvest={() => alert("Invest")}
+        onInvest={() => navigate("/invest")}
         chartSrc={chartDownIcon}
       />
     </PageContainer>

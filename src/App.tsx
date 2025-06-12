@@ -12,6 +12,7 @@ import Strategies from "./pages/Strategies";
 import About from "./pages/About";
 import Refferal from "./pages/Referrals";
 import Main from "./pages/Main";
+import Invest from "./pages/Invest";
 
 const Wrapper = styled.div`
   min-height: 100vh;
@@ -66,6 +67,7 @@ function AppRoutes() {
         <Route path="/strategies" element={<Strategies />} />
         <Route path="/about" element={<About />} />
         <Route path="/refferal" element={<Refferal />} />
+        <Route path="/invest" element={<Invest />} />
         <Route path="*" element={<Navigate to="/trades" replace />} />
       </Routes>
       <BottomNavWrapper>

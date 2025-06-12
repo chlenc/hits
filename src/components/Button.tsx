@@ -17,6 +17,7 @@ const Button = styled.button`
   letter-spacing: -0.36px;  
   width: 100%;
   box-sizing: border-box;
+  color: #fff;
 `;
 
 export default Button;

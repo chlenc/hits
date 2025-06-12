@@ -7,14 +7,8 @@ import Button from "../components/Button";
 import copyIcon from "../assets/icons/copy.svg";
 import { Column, Row } from "../components/Flex";
 import Input from "../components/Input";
+import Section from "../components/Section";
 
-const Section = styled.div`
-  display: flex;
-  padding: 24px 16px;
-  flex-direction: column;
-  border-radius: 32px;
-  background: #212121;
-`;
 
 const SectionTitle = styled.h5`
   font-family: "Instrument Sans";
