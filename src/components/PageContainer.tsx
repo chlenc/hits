@@ -7,7 +7,7 @@ const PageContainer = styled.div`
 
   min-height: 100vh;
   width: 100%;
-  max-width: 420px;
+  max-width: 480px;
 
   padding: 24px 16px 120px 16px;
   box-sizing: border-box;

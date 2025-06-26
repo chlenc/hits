@@ -1,18 +1,26 @@
+import styled from "@emotion/styled";
 import {
   HashRouter,
-  Routes,
-  Route,
-  useLocation,
   Navigate,
+  Route,
+  Routes,
+  useLocation,
 } from "react-router-dom";
-import styled from "@emotion/styled";
-import BottomNav from "./components/BottomNav";
-import Trades from "./pages/Trades";
-import Strategies from "./pages/Strategies";
-import About from "./pages/About";
-import Refferal from "./pages/Referrals";
-import Main from "./pages/Main";
-import Invest from "./pages/Invest";
+import { useEffect } from "react";
+import {
+  ConnectButton,
+  darkTheme,
+  RainbowKitProvider,
+  useConnectModal,
+} from "@rainbow-me/rainbowkit";
+import { useAccount, useChainId, useConfig, WagmiProvider } from "wagmi";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { wagmiConfig } from "./configs/wagmiConfig";
+import { loadState } from "./utils/localStorage";
+import RootStore from "./stores/RootStore";
+import { storesContext, useStores } from "./stores/useStores";
+import { observer } from "mobx-react-lite";
+import Presale from "./pages/Presale";
 
 const Wrapper = styled.div`
   min-height: 100vh;
@@ -43,8 +51,8 @@ const BottomNavInner = styled.div`
 `;
 
 export const pages = [
-  { path: "/main", label: "Main", },
-  { path: "/trades", label: "Trades"},
+  { path: "/main", label: "Main" },
+  { path: "/trades", label: "Trades" },
   {
     path: "/strategies",
     label: "Strategies",
@@ -55,34 +63,78 @@ export const pages = [
 
 function AppRoutes() {
   const location = useLocation();
+
   // Определяем активный таб по location.pathname
   let active =
     pages.find((p) => location.pathname.startsWith(p.path))?.label || "Trades";
   return (
     <Wrapper>
       <Routes>
-        <Route path="/" element={<Navigate to="/trades" replace />} />
+        <Route path="/" element={<Presale />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+
+        {/* <Route path="/" element={<Navigate to="/trades" replace />} />
         <Route path="/main" element={<Main />} />
         <Route path="/trades" element={<Trades />} />
         <Route path="/strategies" element={<Strategies />} />
         <Route path="/about" element={<About />} />
         <Route path="/refferal" element={<Refferal />} />
-        <Route path="/invest" element={<Invest />} />
-        <Route path="*" element={<Navigate to="/trades" replace />} />
+        <Route path="/invest" element={<Invest />} /> */}
+        {/* <Route path="*" element={<Navigate to="/trades" replace />} /> */}
       </Routes>
-      <BottomNavWrapper>
+      {/* <BottomNavWrapper>
         <BottomNavInner>
           <BottomNav active={active} />
         </BottomNavInner>
-      </BottomNavWrapper>
+      </BottomNavWrapper> */}
     </Wrapper>
   );
 }
+const queryClient = new QueryClient();
+
+const initialState = loadState();
+const mobxStore = new RootStore(initialState);
 
 export default function App() {
   return (
     <HashRouter>
-      <AppRoutes />
+      <WagmiProvider config={wagmiConfig}>
+        <QueryClientProvider client={queryClient}>
+          <RainbowKitProvider
+            locale="en"
+            modalSize="compact"
+            theme={darkTheme({
+              accentColor: "#212121",
+              accentColorForeground: "white",
+              borderRadius: "medium",
+              fontStack: "system",
+            })}
+            initialChain={wagmiConfig.chains[0]}
+          >
+            <storesContext.Provider value={mobxStore}>
+              <_SyncDataFromHook_ />
+              <AppRoutes />
+            </storesContext.Provider>
+          </RainbowKitProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
     </HashRouter>
   );
 }
+
+// Separate component to handle account sync inside WagmiProvider
+const _SyncDataFromHook_ = observer(() => {
+  const { address, isConnected } = useAccount();
+  const chainId = useChainId();
+  const config = useConfig();
+  const { accountStore } = useStores();
+
+  useEffect(() => {
+    accountStore.setAddress(address);
+    accountStore.setIsConnected(isConnected);
+    accountStore.setChainId(chainId);
+    accountStore.setWagmiConfig(config);
+  }, [address, isConnected, chainId]);
+
+  return null;
+});
