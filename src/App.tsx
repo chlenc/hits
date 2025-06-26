@@ -1,26 +1,15 @@
 import styled from "@emotion/styled";
-import {
-  HashRouter,
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-} from "react-router-dom";
-import { useEffect } from "react";
-import {
-  ConnectButton,
-  darkTheme,
-  RainbowKitProvider,
-  useConnectModal,
-} from "@rainbow-me/rainbowkit";
-import { useAccount, useChainId, useConfig, WagmiProvider } from "wagmi";
+import { darkTheme, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { observer } from "mobx-react-lite";
+import { useEffect } from "react";
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
+import { useAccount, useChainId, useConfig, WagmiProvider } from "wagmi";
 import { wagmiConfig } from "./configs/wagmiConfig";
-import { loadState } from "./utils/localStorage";
+import Presale from "./pages/Presale";
 import RootStore from "./stores/RootStore";
 import { storesContext, useStores } from "./stores/useStores";
-import { observer } from "mobx-react-lite";
-import Presale from "./pages/Presale";
+import { loadState } from "./utils/localStorage";
 
 const Wrapper = styled.div`
   min-height: 100vh;
@@ -32,23 +21,23 @@ const Wrapper = styled.div`
   box-sizing: border-box;
 `;
 
-const BottomNavWrapper = styled.div`
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 100;
-`;
+// const BottomNavWrapper = styled.div`
+//   position: fixed;
+//   left: 0;
+//   right: 0;
+//   bottom: 0;
+//   display: flex;
+//   justify-content: center;
+//   pointer-events: none;
+//   z-index: 100;
+// `;
 
-const BottomNavInner = styled.div`
-  width: 100%;
-  padding: 0 16px 32px 16px;
-  box-sizing: border-box;
-  pointer-events: all;
-`;
+// const BottomNavInner = styled.div`
+//   width: 100%;
+//   padding: 0 16px 32px 16px;
+//   box-sizing: border-box;
+//   pointer-events: all;
+// `;
 
 export const pages = [
   { path: "/main", label: "Main" },
@@ -62,11 +51,10 @@ export const pages = [
 ];
 
 function AppRoutes() {
-  const location = useLocation();
-
+  // const location = useLocation();
   // Определяем активный таб по location.pathname
-  let active =
-    pages.find((p) => location.pathname.startsWith(p.path))?.label || "Trades";
+  // let active =
+  //   pages.find((p) => location.pathname.startsWith(p.path))?.label || "Trades";
   return (
     <Wrapper>
       <Routes>

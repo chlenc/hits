@@ -1,10 +1,10 @@
 import { HermesClient } from "@pythnetwork/hermes-client";
 import { makeAutoObservable, reaction, runInAction } from "mobx";
 import { createPublicClient, http } from "viem";
-import { Coins, TICKET_PRICE } from "../configs/networkConfig";
+import { COINS } from "../configs/networkConfig";
+import { presaleAbi } from "../configs/presaleAbi";
 import BN from "../utils/BN";
 import RootStore from "./RootStore";
-import { presaleAbi } from "../configs/presaleAbi";
 type TBalance = {
   symbol: string;
   decimals: number;
@@ -17,7 +17,7 @@ class BalanceStore {
   balances: Record<string, TBalance> = {};
   prices: Record<string, number> = {};
 
-  constructor(rootStore: RootStore, initState?: any) {
+  constructor(rootStore: RootStore, _initState?: any) {
     this.rootStore = rootStore;
     makeAutoObservable(this);
 
@@ -45,7 +45,7 @@ class BalanceStore {
       chain: {
         id: chainId,
         name: networkConfig.name,
-        nativeCurrency: { name: "Ether", symbol: Coins.ETH, decimals: 18 },
+        nativeCurrency: { name: "Ether", symbol: COINS.ETH, decimals: 18 },
         rpcUrls: { default: { http: [rpc] } },
       },
       transport: http(),

@@ -9,7 +9,7 @@ export default class RootStore {
   accountStore: AccountStore;
   balanceStore: BalanceStore;
 
-  constructor(initialState?: ISerializedRootStore) {
+  constructor(_initialState?: ISerializedRootStore) {
     this.accountStore = new AccountStore(this);
     this.balanceStore = new BalanceStore(this);
     makeAutoObservable(this);

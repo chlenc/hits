@@ -1,28 +1,21 @@
 import styled from "@emotion/styled";
-import React, { useEffect, useState } from "react";
-import PageContainer from "../../components/PageContainer";
-import PageTitle from "../../components/PageTitle";
-import SizedBox from "../../components/SizedBox";
-import Button from "../../components/Button";
-import { Row } from "../../components/Flex";
-import Section from "../../components/Section";
-import tickerPicture from "../../assets/images/ticketPreview.svg";
+import { ConnectButton, useConnectModal } from "@rainbow-me/rainbowkit";
+import { observer } from "mobx-react-lite";
+import React from "react";
+import arrowIcon from "../../assets/icons/arrow.svg";
 import ticketIcon from "../../assets/icons/ticket.svg";
 import walletIcon from "../../assets/icons/wallet.svg";
-import arrowIcon from "../../assets/icons/arrow.svg";
-import { useStores } from "../../stores/useStores";
-import { observer } from "mobx-react-lite";
-import BN from "../../utils/BN";
-import { ConnectButton, useConnectModal } from "@rainbow-me/rainbowkit";
-import {
-  useContractRead,
-  useContractWrite,
-  useWaitForTransactionReceipt,
-} from "wagmi";
-import { presaleAbi } from "../../configs/presaleAbi";
-import { parseEther } from "viem";
-import { PresaleVMProvider, usePresaleVM } from "./PresaleVM";
+import tickerPicture from "../../assets/images/ticketPreview.svg";
+import Button from "../../components/Button";
+import { Row } from "../../components/Flex";
+import PageContainer from "../../components/PageContainer";
+import PageTitle from "../../components/PageTitle";
+import Section from "../../components/Section";
+import SizedBox from "../../components/SizedBox";
 import { TICKET_PRICE } from "../../configs/networkConfig";
+import { useStores } from "../../stores/useStores";
+import BN from "../../utils/BN";
+import { PresaleVMProvider, usePresaleVM } from "./PresaleVM";
 
 const SectionTitle = styled.h5`
   font-family: "Instrument Sans";

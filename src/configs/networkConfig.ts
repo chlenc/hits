@@ -1,20 +1,20 @@
-export enum Networks {
-  SEPOLIA = "sepolia",
-  BASE = "base",
+export const NETWORKS = {
+  SEPOLIA: "sepolia",
+  BASE: "base",
   // ETHEREUM = "ethereum",
   // POLYGON = "polygon",
   // BSC = "bsc",
   // ARBITRUM = "arbitrum",
-}
+};
 
 export const TICKET_PRICE = 0.0008;
 
-export enum Coins {
-  ETH = "ETH",
-  USDT = "USDT",
-  USDC = "USDC",
-  DAI = "DAI",
-}
+export const COINS = {
+  ETH: "ETH",
+  USDT: "USDT",
+  USDC: "USDC",
+  DAI: "DAI",
+} as const;
 
 type TokenConfig = {
   symbol: string;
@@ -36,28 +36,28 @@ type NetworkConfig = {
 
 export const NetworkConfig: Record<string, NetworkConfig> = {
   sepolia: {
-    name: Networks.SEPOLIA,
+    name: NETWORKS.SEPOLIA,
     chainId: 11155111,
     contract: "0x35dC6f1415CBF0221F6babf19e2844A86cF5cDc0",
     rpc: "https://ethereum-sepolia.publicnode.com",
     explorer: "https://sepolia.etherscan.io",
     tokens: [
       {
-        symbol: Coins.ETH,
+        symbol: COINS.ETH,
         decimals: 18,
         isNative: true,
         priceFeed:
           "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
       },
       {
-        symbol: Coins.USDT,
+        symbol: COINS.USDT,
         decimals: 6,
         address: "0x622fd0b24B14Fb76d27d8616a96ECbd05fC27527",
         priceFeed:
           "0x2b89b9dc8fdf9f34709a5b106b472f0f39bb6ca9ce04b0fd7f2e971688e2e53b",
       },
       {
-        symbol: Coins.USDC,
+        symbol: COINS.USDC,
         decimals: 6,
         address: "0xd6F4D4e0550622C8165106F81aaCeB0084ac78Ad",
         priceFeed:
@@ -66,21 +66,21 @@ export const NetworkConfig: Record<string, NetworkConfig> = {
     ],
   },
   base: {
-    name: Networks.BASE,
+    name: NETWORKS.BASE,
     chainId: 8453,
     contract: "0x", // TODO: add contract address
     rpc: "https://mainnet.base.org",
     explorer: "https://basescan.org",
     tokens: [
       {
-        symbol: Coins.USDT,
+        symbol: COINS.USDT,
         decimals: 6,
         address: "0xA614E4c8E06a7F0719B6d95aBdcF9D4b46b16bcF",
         priceFeed:
           "0x2b89b9dc8fdf9f34709a5b106b472f0f39bb6ca9ce04b0fd7f2e971688e2e53b",
       },
       {
-        symbol: Coins.USDC,
+        symbol: COINS.USDC,
         decimals: 6,
         address: "0xD9b312D77Bc7B2e29Ff8beE60a77A5f9E69E6cDC",
         priceFeed:
@@ -89,7 +89,7 @@ export const NetworkConfig: Record<string, NetworkConfig> = {
     ],
   },
   // ethereum: {
-  //   name: Networks.ETHEREUM,
+  //   name: NETWORKS.ETHEREUM,
   //   chainId: 1,
   //   contract: "",
   //   rpc: "https://ethereum.publicnode.com",
@@ -116,7 +116,7 @@ export const NetworkConfig: Record<string, NetworkConfig> = {
   //     ]
   // },
   // polygon: {
-  //   name: Networks.POLYGON,
+  //   name: NETWORKS.POLYGON,
   //   chainId: 137,
   //   contract: "",
   //   rpc: "https://polygon-rpc.com",
@@ -137,7 +137,7 @@ export const NetworkConfig: Record<string, NetworkConfig> = {
   // ]
   // },
   // bsc: {
-  //   name: Networks.BSC,
+  //   name: NETWORKS.BSC,
   //   chainId: 56,
   //   contract: "",
   //   rpc: "https://bsc-dataseed.binance.org/",
@@ -158,7 +158,7 @@ export const NetworkConfig: Record<string, NetworkConfig> = {
   // ]
   // },
   // arbitrum: {
-  //   name: Networks.ARBITRUM,
+  //   name: NETWORKS.ARBITRUM,
   //   chainId: 42161,
   //   contract: "",
   //   rpc: "https://arb1.arbitrum.io/rpc",

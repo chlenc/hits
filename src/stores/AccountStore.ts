@@ -12,7 +12,7 @@ class AccountStore {
   chainId: number | null = null;
   wagmiConfig: Config | null = null;
 
-  constructor(rootStore: RootStore, initState?: any) {
+  constructor(rootStore: RootStore, _initState?: any) {
     this.rootStore = rootStore;
     makeAutoObservable(this);
   }

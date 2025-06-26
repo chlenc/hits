@@ -7,12 +7,11 @@ import {
   http,
   parseEther,
 } from "viem";
-import { presaleAbi } from "../../configs/presaleAbi";
+import { TICKET_PRICE } from "../../configs/networkConfig";
 import RootStore from "../../stores/RootStore";
 import { useStores } from "../../stores/useStores";
 import { useVM } from "../../stores/useVM";
 import BN from "../../utils/BN";
-import { TICKET_PRICE } from "../../configs/networkConfig";
 
 const ctx = React.createContext<PresaleVM | null>(null);
 export const PresaleVMProvider: React.FC<PropsWithChildren> = ({
