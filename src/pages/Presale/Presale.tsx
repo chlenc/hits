@@ -2,6 +2,8 @@ import styled from "@emotion/styled";
 import { ConnectButton, useConnectModal } from "@rainbow-me/rainbowkit";
 import { observer } from "mobx-react-lite";
 import React from "react";
+import { useSendTransaction, useConfig } from "wagmi";
+import { waitForTransactionReceipt } from "wagmi/actions";
 import arrowIcon from "../../assets/icons/arrow.svg";
 import ticketIcon from "../../assets/icons/ticket.svg";
 import walletIcon from "../../assets/icons/wallet.svg";
@@ -84,9 +86,66 @@ const PresaleImpl: React.FC = observer(() => {
   const { accountStore, balanceStore } = useStores();
   const presaleVM = usePresaleVM();
   const modal = useConnectModal();
+  const { sendTransactionAsync } = useSendTransaction();
+  const config = useConfig();
 
-  const balance = balanceStore.balances.ETH?.balance ?? "0";
-  const price = new BN(presaleVM.ticketAmount * TICKET_PRICE).toFormat(4);
+  const balance = presaleVM.ethBalance;
+  const price = new BN(presaleVM.ticketAmount * TICKET_PRICE)
+    .toSignificant(4)
+    .toFormat();
+
+  const handleBuyTickets = async () => {
+    presaleVM.setError(null);
+
+    // Check if user has enough balance
+    const requiredBalance = presaleVM.ticketAmount * TICKET_PRICE;
+    const currentBalance = Number(balance);
+
+    if (currentBalance < requiredBalance) {
+      presaleVM.setError("Insufficient balance");
+      return;
+    }
+
+    presaleVM.setIsLoading(true);
+
+    try {
+      const { networkConfig, address } = accountStore;
+      if (!networkConfig || !address) {
+        throw new Error("Network config or address not available");
+      }
+
+      const { contract } = networkConfig;
+
+      // Send transaction using wagmi
+      const hash = await sendTransactionAsync({
+        to: contract as `0x${string}`,
+        value: BigInt(
+          (presaleVM.ticketAmount * TICKET_PRICE * 10 ** 18).toString()
+        ),
+      });
+
+      // Wait for transaction confirmation
+      const receipt = await waitForTransactionReceipt(config, {
+        hash,
+        chainId: networkConfig.chainId,
+      });
+
+      if (receipt.status === "success") {
+        // Update balances after successful transaction
+        await balanceStore.updateTokenBalances();
+      }
+
+      // Reset ticket amount after initiating purchase
+      presaleVM.setTicketAmount(1);
+    } catch (err) {
+      console.error("Error buying tickets:", err);
+      presaleVM.setError(
+        err instanceof Error ? err.message : "Failed to buy tickets"
+      );
+    } finally {
+      presaleVM.setIsLoading(false);
+    }
+  };
 
   return (
     <PageContainer>
@@ -121,7 +180,7 @@ const PresaleImpl: React.FC = observer(() => {
             <img src={walletIcon} alt="icon" width={12} />
             &nbsp;
             <SecondaryText>
-              Balance: {new BN(balance).toFormat(4)} ETH
+              Balance: {new BN(balance).toSignificant(4).toFormat()} ETH
             </SecondaryText>
           </Row>
           <Row alignItems="center" justifyContent="flex-end">
@@ -140,8 +199,11 @@ const PresaleImpl: React.FC = observer(() => {
           </>
         )}
         {accountStore.isConnected ? (
-          <Button onClick={presaleVM.handleBuyTickets} disabled={presaleVM.isLoading}>
-            {presaleVM.isLoading ? "Processing..." : `Buy ${presaleVM.ticketAmount} tickets`} &nbsp;
+          <Button onClick={handleBuyTickets} disabled={presaleVM.isLoading}>
+            {presaleVM.isLoading
+              ? "Processing..."
+              : `Buy ${presaleVM.ticketAmount} tickets`}{" "}
+            &nbsp;
             {!presaleVM.isLoading && <img src={arrowIcon} alt="arrowIcon" />}
           </Button>
         ) : (

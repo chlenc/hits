@@ -59,71 +59,7 @@ class PresaleVM {
   }
 
   get ethBalance() {
-    return this.rootStore.balanceStore.balances.ETH?.balance ?? "0";
+    return this.rootStore.balanceStore.balances.ETH?.balance ?? 0;
   }
 
-  handleBuyTickets = async () => {
-    this.setError(null);
-    // Check if user has enough balance
-    const requiredBalance = this.ticketAmount * TICKET_PRICE;
-    const currentBalance = Number(this.ethBalance);
-
-    if (currentBalance < requiredBalance) {
-      this.setError("Insufficient balance");
-      return;
-    }
-    this.setIsLoading(true);
-    try {
-      const { networkConfig, address } = this.rootStore.accountStore;
-      if (!networkConfig || !address) {
-        throw new Error("Network config or address not available");
-      }
-
-      const { chainId, contract, rpc } = networkConfig;
-
-      const client = createPublicClient({
-        chain: {
-          id: chainId,
-          name: networkConfig.name,
-          nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-          rpcUrls: { default: { http: [rpc] } },
-        },
-        transport: http(),
-      });
-
-      const walletClient = createWalletClient({
-        account: address as `0x${string}`,
-        chain: {
-          id: chainId,
-          name: networkConfig.name,
-          nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-          rpcUrls: { default: { http: [rpc] } },
-        },
-        transport: custom(window.ethereum),
-      });
-
-      const hash = await walletClient.sendTransaction({
-        to: contract as `0x${string}`,
-        value: parseEther((this.ticketAmount * TICKET_PRICE).toString()),
-      });
-
-      // Wait for transaction confirmation
-      const receipt = await client.waitForTransactionReceipt({ hash });
-
-      if (receipt.status === "success") {
-        // Update balances after successful transaction
-        await this.rootStore.balanceStore.updateTokenBalances();
-      }
-
-      // Reset ticket amount after initiating purchase
-      this.setTicketAmount(1);
-    } catch (err) {
-      console.error("Error buying tickets:", err);
-      this.setError(
-        err instanceof Error ? err.message : "Failed to buy tickets"
-      );
-    } finally {
-      this.setIsLoading(false);
-    }
-  };
 }
