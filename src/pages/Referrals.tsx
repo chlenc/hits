@@ -8,7 +8,11 @@ import copyIcon from "../assets/icons/copy.svg";
 import { Column, Row } from "../components/Flex";
 import Input from "../components/Input";
 import Section from "../components/Section";
-import starsIcon from "../assets/icons/stars.svg";
+// import starsIcon from "../assets/icons/stars.svg";
+import { observer } from "mobx-react-lite";
+import { useStores } from "../stores/useStores";
+import { useWalletConnectRedirect } from "../hooks/useWalletConnectRedirect";
+import centerEllipsis from "../utils/centerEllipsis";
 
 const SectionTitle = styled.h5`
   font-family: "Instrument Sans";
@@ -32,51 +36,55 @@ const SecondaryText = styled.div<{ align?: "left" | "right" | "center" }>`
   letter-spacing: -0.12px;
 `;
 
-const referrals = [
-  { link: "t.me/sgasgasjitwj2984", reward: 10 },
-  { link: "t.me/k34tjht8282", reward: 5 },
-  { link: "t.me/lsoooptetwqsd", reward: 5 },
-  { link: "t.me/j5j5j45jffsgsag", reward: 5 },
-  { link: "t.me/gkrutraew591qpqqq", reward: 5 },
-];
+const Referrals: React.FC = observer(() => {
+  const { referralStore } = useStores();
 
-const Referrals: React.FC = () => {
+  useWalletConnectRedirect({
+    redirectPath: "/strategies",
+    autoOpenModal: true,
+  });
+
+  console.log({ referralStore: referralStore.refferals });
+
   return (
     <PageContainer>
       <PageTitle>Referrals</PageTitle>
       <Section>
         <SectionTitle>My referral link</SectionTitle>
         <SizedBox height={24} />
-        <Input value="https://t.me/sgasgasjitwj2984" />
+        <Input value={referralStore.referralLink ?? ""} readOnly />
         <SizedBox height={24} />
-        <Button>
+        <Button onClick={referralStore.copyReferralLink}>
           Copy link &nbsp; <img src={copyIcon} alt="copy" />
         </Button>
-        <SizedBox height={16} />
-        <SecondaryText align="center">
-          The offer will renew in 00:00:52
-        </SecondaryText>
+        {referralStore.userData?.referrer != null && (
+          <SecondaryText align="center" style={{ marginTop: 16 }}>
+            Your referer {centerEllipsis(referralStore.userData?.referrer)}
+          </SecondaryText>
+        )}
       </Section>
-      <Section>
+     {referralStore.refferals.length > 0 && <Section>
         <SectionTitle>My referrals</SectionTitle>
         <SizedBox height={24} />
         <Column gap={16} crossAxisSize="max">
-          {referrals.map((referral) => (
-            <Row key={referral.link} justifyContent="space-between">
-              <SecondaryText>{referral.link}</SecondaryText>
-              <SecondaryText align="right">
-                +{referral.reward} SOL
+          {referralStore.refferals.map((referral, index) => (
+            <Row key={referral.address} justifyContent="space-between">
+              <SecondaryText>
+                {index + 1}. {centerEllipsis(referral.address)}
               </SecondaryText>
+              {/* <SecondaryText align="right">
+                +{referral.reward} SOL
+              </SecondaryText> */}
             </Row>
           ))}
         </Column>
-        <SizedBox height={24} />
+        {/* <SizedBox height={24} />
         <Button secondary>
           Claim all &nbsp; <img src={starsIcon} alt="stars" />
-        </Button>
-      </Section>
+        </Button> */}
+      </Section>}
     </PageContainer>
   );
-};
+});
 
 export default Referrals;

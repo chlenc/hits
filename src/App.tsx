@@ -22,6 +22,7 @@ import Trades from "./pages/Trades";
 import Strategies from "./pages/Strategies";
 import About from "./pages/About";
 import Invest from "./pages/Invest";
+import { ToastContainer } from "react-toastify";
 
 const Wrapper = styled.div`
   min-height: 100vh;
@@ -80,7 +81,7 @@ function AppRoutes() {
         <Route path="/about" element={<About />} />
         <Route path="/refferal" element={<Refferal />} />
         <Route path="/invest" element={<Invest />} />
-        <Route path="*" element={<Navigate to="/main" replace />} />
+        <Route path="*" element={<Navigate to="/strategies" replace />} />
       </Routes>
       <BottomNavWrapper>
         <BottomNavInner>
@@ -114,6 +115,7 @@ export default function App() {
             <storesContext.Provider value={mobxStore}>
               <_SyncDataFromHook_ />
               <AppRoutes />
+              <ToastContainer  />
             </storesContext.Provider>
           </RainbowKitProvider>
         </QueryClientProvider>

@@ -6,6 +6,7 @@ import styled from "@emotion/styled";
 import SizedBox from "../components/SizedBox";
 import Button from "../components/Button";
 import starsIcon from "../assets/icons/stars.svg";
+import { useWalletConnectRedirect } from "../hooks/useWalletConnectRedirect";
 
 const StyledPageContainer = styled(PageContainer)`
   gap: 32px;
@@ -29,14 +30,17 @@ const SecondaryTitle = styled.div<{ color?: string }>`
 `;
 
 const Main: React.FC = () => {
+  useWalletConnectRedirect({
+    redirectPath: "/strategies",
+    autoOpenModal: true,
+  });
+
   return (
     <StyledPageContainer>
-      <Column gap={16}>
+      <Row justifyContent="space-between" alignItems="center">
         <PageTitle>Main</PageTitle>
-        <Row justifyContent="start">
-          <ConnectButton />
-        </Row>
-      </Column>
+        <ConnectButton />
+      </Row>
       <Column crossAxisSize="max">
         <BlockTitle>Claimable Balance</BlockTitle>
         <Row alignItems="flex-end">

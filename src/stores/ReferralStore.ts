@@ -1,143 +1,73 @@
-import { makeAutoObservable, runInAction } from "mobx";
+import { makeAutoObservable, reaction } from "mobx";
+import { disconnect } from "@wagmi/core";
+import { apiService, type UserData } from "../services/api";
 import RootStore from "./RootStore";
+import { createWalletClient, custom } from "viem";
+import { base } from "viem/chains";
+import { toast } from "react-toastify";
 
 export interface IReferralData {
   referrer?: string;
-  referralCode?: string;
-  referralLink?: string;
-  isReferralActive: boolean;
+  signature?: string;
 }
 
 class ReferralStore {
   public readonly rootStore: RootStore;
-  
-  // Состояние реферальной системы
-  referrer?: string;
-  referralCode?: string;
-  referralLink?: string;
-  isReferralActive: boolean = false;
-  isProcessing: boolean = false;
 
-  constructor(rootStore: RootStore, _initState?: any) {
+  referrer?: string;
+  signature?: string;
+  isAuthenticating: boolean = false;
+  refferals: UserData[] = [];
+  userData?: {
+    address: string;
+    createdAt: string;
+    referrer?: string;
+  };
+
+  constructor(rootStore: RootStore, initState?: IReferralData) {
     this.rootStore = rootStore;
     makeAutoObservable(this);
-    
-    // Инициализация при создании стора
-    this.initializeReferral();
+
+    if (initState != null) {
+      this.referrer = initState.referrer;
+      this.signature = initState.signature;
+    }
+
+    const referralFromURL = this.extractReferralFromURL();
+    if (referralFromURL) {
+      this.referrer = referralFromURL;
+    }
+
+    // Автоматическая аутентификация при подключении кошелька
+    reaction(
+      () => [
+        this.rootStore.accountStore.isConnected,
+        this.rootStore.accountStore.address,
+      ],
+      ([isConnected, address]) => {
+        if (isConnected && address) {
+          this.authenticateUser();
+        }
+      },
+      { fireImmediately: true }
+    );
+
+    console.log({
+      initState: initState?.referrer,
+      signature: this.signature,
+      url: this.extractReferralFromURL(),
+      referrer: this.referrer,
+    });
   }
 
-  /**
-   * Инициализация реферальной системы
-   * Загружает сохраненный referrer из localStorage и генерирует ссылку
-   */
-  initializeReferral = () => {
-    this.loadReferrerFromStorage();
-    this.generateReferralLink();
-  };
-
-  /**
-   * Загрузка referrer из localStorage
-   */
-  loadReferrerFromStorage = () => {
+  extractReferralFromURL = () => {
     if (typeof window === "undefined") return;
-    
-    try {
-      const savedReferrer = localStorage.getItem("referrer");
-      if (savedReferrer) {
-        runInAction(() => {
-          this.referrer = savedReferrer;
-          this.isReferralActive = true;
-        });
-      }
-    } catch (error) {
-      console.error("Error loading referrer from localStorage:", error);
-    }
+    return new URLSearchParams(window.location.search).get("ref");
   };
 
-  /**
-   * Сохранение referrer в localStorage
-   */
-  saveReferrerToStorage = (referrer: string) => {
-    if (typeof window === "undefined") return;
-    
-    try {
-      localStorage.setItem("referrer", referrer);
-      runInAction(() => {
-        this.referrer = referrer;
-        this.isReferralActive = true;
-      });
-    } catch (error) {
-      console.error("Error saving referrer to localStorage:", error);
-    }
-  };
-
-  /**
-   * Очистка referrer из localStorage
-   */
-  clearReferrerFromStorage = () => {
-    if (typeof window === "undefined") return;
-    
-    try {
-      localStorage.removeItem("referrer");
-      runInAction(() => {
-        this.referrer = undefined;
-        this.isReferralActive = false;
-      });
-    } catch (error) {
-      console.error("Error clearing referrer from localStorage:", error);
-    }
-  };
-
-  /**
-   * Генерация реферальной ссылки для текущего пользователя
-   */
-  generateReferralLink = () => {
-    const { address } = this.rootStore.accountStore;
-    
-    if (!address) {
-      runInAction(() => {
-        this.referralLink = undefined;
-        this.referralCode = undefined;
-      });
-      return;
-    }
-
-    // Используем адрес кошелька как реферальный код
-    const code = address.toLowerCase();
-    const link = `https://hits4.fun/?ref=${code}`;
-    
-    runInAction(() => {
-      this.referralCode = code;
-      this.referralLink = link;
-    });
-  };
-
-  /**
-   * Обработка реферальной ссылки из URL
-   * Вызывается при загрузке страницы для проверки параметра ?ref=
-   */
-  processReferralFromURL = () => {
-    if (typeof window === "undefined") return;
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const refParam = urlParams.get("ref");
-    
-    if (refParam) {
-      this.saveReferrerToStorage(refParam);
-      
-      // Очищаем параметр из URL без перезагрузки страницы
-      const newUrl = new URL(window.location.href);
-      newUrl.searchParams.delete("ref");
-      window.history.replaceState({}, "", newUrl.toString());
-    }
-  };
-
-  /**
-   * Копирование реферальной ссылки в буфер обмена
-   */
   copyReferralLink = async (): Promise<boolean> => {
     if (!this.referralLink) return false;
-    
+
     try {
       await navigator.clipboard.writeText(this.referralLink);
       return true;
@@ -147,66 +77,69 @@ class ReferralStore {
     }
   };
 
-  /**
-   * Получение данных для отправки на бэкенд
-   * Вызывается при авторизации пользователя
-   */
-  getReferralDataForBackend = (): { referrer?: string } => {
+  get referralLink() {
+    return this.rootStore.accountStore.address
+      ? `hits4.fun/?ref=${this.rootStore.accountStore.address.toLowerCase()}`
+      : "hits4.fun";
+  }
+
+  // Проверка, может ли пользователь генерировать реферальные ссылки
+  get canGenerateReferral(): boolean {
+    return (
+      this.rootStore.accountStore.isConnected &&
+      !!this.rootStore.accountStore.address
+    );
+  }
+
+  private async authenticateUser() {
+    const { address, chainId, wagmiConfig } = this.rootStore.accountStore;
+    if (!address || this.isAuthenticating || !wagmiConfig || !chainId) return;
+    this.isAuthenticating = true;
+
+    try {
+      const { message } = await apiService.getAuthMessage();
+      let signature = this.signature;
+      if (!signature) {
+        const walletClient = createWalletClient({
+          account: address,
+          chain: base,
+          transport: custom(window.ethereum),
+        });
+        this.signature = await walletClient.signMessage({
+          message,
+          account: address,
+        });
+        signature = this.signature;
+      }
+      const userData = await apiService.authenticateUser(
+        signature,
+        address,
+        this.referrer
+      );
+      this.userData = userData;
+      const { referrals } = await apiService.getRefferals(
+        signature,
+        address,
+        this.referrer
+      );
+      this.refferals = referrals;
+    } catch (error: any) {
+      const errorMessage = error.shortMessage ?? error.toString();
+      toast.error(errorMessage);
+      this.signature = undefined;
+      this.referrer = undefined;
+      disconnect(wagmiConfig);
+    } finally {
+      this.isAuthenticating = false;
+    }
+  }
+
+  serialize = () => {
     return {
       referrer: this.referrer,
+      signature: this.signature,
     };
-  };
-
-  /**
-   * Проверка, является ли текущий пользователь рефералом
-   */
-  get isReferral(): boolean {
-    return this.isReferralActive && !!this.referrer;
-  }
-
-  /**
-   * Проверка, может ли пользователь генерировать реферальные ссылки
-   */
-  get canGenerateReferral(): boolean {
-    return this.rootStore.accountStore.isConnected && !!this.rootStore.accountStore.address;
-  }
-
-  /**
-   * Получение короткого реферального кода для отображения
-   */
-  get shortReferralCode(): string {
-    if (!this.referralCode) return "";
-    return `${this.referralCode.slice(0, 6)}...${this.referralCode.slice(-4)}`;
-  }
-
-  /**
-   * Получение короткого referrer кода для отображения
-   */
-  get shortReferrerCode(): string {
-    if (!this.referrer) return "";
-    return `${this.referrer.slice(0, 6)}...${this.referrer.slice(-4)}`;
-  }
-
-  /**
-   * Установка состояния обработки
-   */
-  setProcessing = (isProcessing: boolean) => {
-    this.isProcessing = isProcessing;
-  };
-
-  /**
-   * Сброс состояния реферальной системы
-   */
-  reset = () => {
-    runInAction(() => {
-      this.referrer = undefined;
-      this.referralCode = undefined;
-      this.referralLink = undefined;
-      this.isReferralActive = false;
-      this.isProcessing = false;
-    });
-    this.clearReferrerFromStorage();
   };
 }
 
-export default ReferralStore; 
+export default ReferralStore;

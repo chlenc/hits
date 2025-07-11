@@ -2,8 +2,14 @@ import React from "react";
 import PageContainer from "../components/PageContainer";
 import PageTitle from "../components/PageTitle";
 import StrategyCard from "../components/StrategyCard";
+import { useWalletConnectRedirect } from "../hooks/useWalletConnectRedirect";
 
 const Trades: React.FC = () => {
+  useWalletConnectRedirect({
+    redirectPath: "/strategies",
+    autoOpenModal: true,
+  });
+
   return (
     <PageContainer>
       <PageTitle>My trades</PageTitle>
