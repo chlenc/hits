@@ -8,7 +8,7 @@ import copyIcon from "../assets/icons/copy.svg";
 import { Column, Row } from "../components/Flex";
 import Input from "../components/Input";
 import Section from "../components/Section";
-
+import starsIcon from "../assets/icons/stars.svg";
 
 const SectionTitle = styled.h5`
   font-family: "Instrument Sans";
@@ -70,6 +70,10 @@ const Referrals: React.FC = () => {
             </Row>
           ))}
         </Column>
+        <SizedBox height={24} />
+        <Button secondary>
+          Claim all &nbsp; <img src={starsIcon} alt="stars" />
+        </Button>
       </Section>
     </PageContainer>
   );

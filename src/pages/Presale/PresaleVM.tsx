@@ -1,12 +1,5 @@
 import { makeAutoObservable } from "mobx";
 import React, { type PropsWithChildren, useMemo } from "react";
-import {
-  createPublicClient,
-  createWalletClient,
-  custom,
-  http,
-  parseEther,
-} from "viem";
 import { TICKET_PRICE } from "../../configs/networkConfig";
 import RootStore from "../../stores/RootStore";
 import { useStores } from "../../stores/useStores";
