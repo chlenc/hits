@@ -7,6 +7,7 @@ const Section = styled.div`
   flex-direction: column;
   border-radius: 32px;
   background: #212121;
+  width: 100%;
 `;
 
 export default Section;

@@ -34,6 +34,8 @@ type NetworkConfig = {
   explorer: string;
 };
 
+
+//price feeds https://www.pyth.network/developers/price-feed-ids
 export const NetworkConfig: Record<string, NetworkConfig> = {
   // sepolia: {
   //   name: NETWORKS.SEPOLIA,
@@ -85,6 +87,13 @@ export const NetworkConfig: Record<string, NetworkConfig> = {
         address: "0xD9b312D77Bc7B2e29Ff8beE60a77A5f9E69E6cDC",
         priceFeed:
           "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+      },
+      {
+        symbol: COINS.ETH,
+        decimals: 18,
+        isNative: true,
+        priceFeed:
+          "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
       },
     ],
   },
