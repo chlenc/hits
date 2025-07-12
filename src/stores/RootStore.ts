@@ -1,22 +1,19 @@
 import { autorun, makeAutoObservable } from "mobx";
-import AccountStore from "./AccountStore";
+import AccountStore, { type IAccountStoreInitState } from "./AccountStore";
 import BalanceStore from "./BalanceStore";
-import ReferralStore, { type IReferralData } from "./ReferralStore";
 import { saveState } from "../utils/localStorage";
 
 export interface ISerializedRootStore {
-  referralStore?: IReferralData;
+  accountStore?: IAccountStoreInitState;
 }
 
 export default class RootStore {
   accountStore: AccountStore;
   balanceStore: BalanceStore;
-  referralStore: ReferralStore;
 
   constructor(initialState?: ISerializedRootStore) {
-    this.accountStore = new AccountStore(this);
+    this.accountStore = new AccountStore(this, initialState?.accountStore);
     this.balanceStore = new BalanceStore(this);
-    this.referralStore = new ReferralStore(this, initialState?.referralStore);
     makeAutoObservable(this);
 
     autorun(
@@ -28,6 +25,6 @@ export default class RootStore {
   }
 
   serialize = (): ISerializedRootStore => ({
-    referralStore: this.referralStore.serialize(),
+    accountStore: this.accountStore.serialize(),
   });
 }

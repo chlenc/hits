@@ -13,6 +13,7 @@ import { observer } from "mobx-react-lite";
 import { useStores } from "../stores/useStores";
 import { useWalletConnectRedirect } from "../hooks/useWalletConnectRedirect";
 import centerEllipsis from "../utils/centerEllipsis";
+import { copyToClipboard } from "../utils/copyToClipboard";
 
 const SectionTitle = styled.h5`
   font-family: "Instrument Sans";
@@ -37,14 +38,12 @@ const SecondaryText = styled.div<{ align?: "left" | "right" | "center" }>`
 `;
 
 const Referrals: React.FC = observer(() => {
-  const { referralStore } = useStores();
+  const { accountStore } = useStores();
 
   useWalletConnectRedirect({
     redirectPath: "/strategies",
     autoOpenModal: true,
   });
-
-  console.log({ referralStore: referralStore.refferals });
 
   return (
     <PageContainer>
@@ -52,37 +51,39 @@ const Referrals: React.FC = observer(() => {
       <Section>
         <SectionTitle>My referral link</SectionTitle>
         <SizedBox height={24} />
-        <Input value={referralStore.referralLink ?? ""} readOnly />
+        <Input value={accountStore.referralLink ?? ""} readOnly />
         <SizedBox height={24} />
-        <Button onClick={referralStore.copyReferralLink}>
+        <Button onClick={() => copyToClipboard(accountStore.referralLink)}>
           Copy link &nbsp; <img src={copyIcon} alt="copy" />
         </Button>
-        {referralStore.userData?.referrer != null && (
+        {accountStore.userData?.referrer != null && (
           <SecondaryText align="center" style={{ marginTop: 16 }}>
-            Your referer {centerEllipsis(referralStore.userData?.referrer)}
+            Your referer {centerEllipsis(accountStore.userData?.referrer)}
           </SecondaryText>
         )}
       </Section>
-     {referralStore.refferals.length > 0 && <Section>
-        <SectionTitle>My referrals</SectionTitle>
-        <SizedBox height={24} />
-        <Column gap={16} crossAxisSize="max">
-          {referralStore.refferals.map((referral, index) => (
-            <Row key={referral.address} justifyContent="space-between">
-              <SecondaryText>
-                {index + 1}. {centerEllipsis(referral.address)}
-              </SecondaryText>
-              {/* <SecondaryText align="right">
+      {accountStore.refferals.length > 0 && (
+        <Section>
+          <SectionTitle>My referrals</SectionTitle>
+          <SizedBox height={24} />
+          <Column gap={16} crossAxisSize="max">
+            {accountStore.refferals.map((referral, index) => (
+              <Row key={referral.address} justifyContent="space-between">
+                <SecondaryText>
+                  {index + 1}. {centerEllipsis(referral.address)}
+                </SecondaryText>
+                {/* <SecondaryText align="right">
                 +{referral.reward} SOL
               </SecondaryText> */}
-            </Row>
-          ))}
-        </Column>
-        {/* <SizedBox height={24} />
+              </Row>
+            ))}
+          </Column>
+          {/* <SizedBox height={24} />
         <Button secondary>
           Claim all &nbsp; <img src={starsIcon} alt="stars" />
         </Button> */}
-      </Section>}
+        </Section>
+      )}
     </PageContainer>
   );
 });
