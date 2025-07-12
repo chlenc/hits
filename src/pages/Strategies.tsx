@@ -1,38 +1,23 @@
 import React from "react";
-import chartDownIcon from "../assets/icons/chartDown.svg";
-import chartUpIcon from "../assets/icons/chartUp.svg";
 import PageContainer from "../components/PageContainer";
 import PageTitle from "../components/PageTitle";
 import StrategyCard from "../components/StrategyCard";
 import { useNavigate } from "react-router-dom";
+import { observer } from "mobx-react-lite";
+import { useStores } from "../stores/useStores";
+import type { Strategy } from "../services/api";
 
-const Strategies: React.FC = () => {
+const Strategies: React.FC = observer(() => {
   const navigate = useNavigate();
+  const { strategiesStore } = useStores();
   return (
     <PageContainer>
       <PageTitle>Select your strategy</PageTitle>
-      <StrategyCard
-        title="Strategy 1"
-        status="in progress"
-        yieldPercent="6%"
-        amount="120 000"
-        asset="BTC"
-        expiration="05.06.2025"
-        onInvest={() => navigate("/invest")}
-        chartSrc={chartUpIcon}
-      />
-      <StrategyCard
-        title="Strategy 2"
-        status="in progress"
-        yieldPercent="6%"
-        amount="120 000"
-        asset="BTC"
-        expiration="05.06.2025"
-        onInvest={() => navigate("/invest")}
-        chartSrc={chartDownIcon}
-      />
+      {strategiesStore.strategies.map((strategy: Strategy) => (
+        <StrategyCard key={strategy.id} strategy={strategy} />
+      ))}
     </PageContainer>
   );
-};
+});
 
 export default Strategies;

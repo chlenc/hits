@@ -13,6 +13,7 @@ import { useStores } from "../stores/useStores";
 import BN from "../utils/BN";
 import Section from "../components/Section";
 import PnLChart from "../components/PnLChart";
+import { useNavigate } from "react-router-dom";
 
 const StyledPageContainer = styled(PageContainer)`
   gap: 32px;
@@ -41,7 +42,7 @@ const Main: React.FC = observer(() => {
     redirectPath: "/strategies",
     autoOpenModal: true,
   });
-
+  const navigate = useNavigate();
   const stats = accountStore.tradingStats;
   const claimableBalance = BN.formatUnits(stats?.claimableBalance ?? "0", 18);
   const claimableBalanceUSD = claimableBalance.times(
@@ -127,7 +128,9 @@ const Main: React.FC = observer(() => {
           </Section>
         )}
         <SizedBox height={16} />
-        <Button secondary>Trades History +</Button>
+        <Button secondary onClick={() => navigate("/trades")}>
+          Trades History +
+        </Button>
       </Column>
       {/* <PageTitle>Strategy of the Day</PageTitle> */}
       {/* <SizedBox height={32} /> */}

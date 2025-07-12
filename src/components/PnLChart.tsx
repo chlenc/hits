@@ -46,15 +46,7 @@ const PnLChart: React.FC<PnLChartProps> = ({ className, data }) => {
               elementType: "line",
             },
           ],
-          series: {
-            type: "line",
-            point: { show: false },
-          },
-          style: {
-            background: "transparent",
-          },
           getSeriesStyle: (series) => {
-            console.log(series);
             if (series.label === "PnL") {
               return {
                 stroke: "#19F096",

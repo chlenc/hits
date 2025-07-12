@@ -23,43 +23,56 @@ export interface TradingStatsResponse {
   winTradesAmount: number;
   loseTradesAmount: number;
   pnl_30d_chart: ChartDataPoint[];
+  userStrategies: Strategy[];
 }
 
-export interface Trade {
+// Base strategy interface with common fields
+interface BaseStrategy {
   id: string;
-  asset: string;
-  expirationDate: string;
+  title: string;
+  symbol: string;
+  expiration: string;
+  depositUntil: string;
   participants: number;
+  estimatedVolatility: "High" | "Medium" | "Low";
+  createdAt: string;
+}
+
+// Open strategy - available for participation
+export interface OpenStrategy extends BaseStrategy {
+  status: "Open";
+}
+
+// Active strategy - currently running
+export interface ActiveStrategy extends BaseStrategy {
+  status: "Active";
   priceAtOpen: string;
-  priceAtClose?: string;
   breakoutRange: {
     min: string;
     max: string;
   };
-  income?: string;
-  status: "active" | "finished";
-  createdAt: string;
 }
 
-export interface TradesResponse {
-  trades: Trade[];
-  total: number;
-  page: number;
-  limit: number;
+// Expired strategy - completed
+export interface ExpiredStrategy extends BaseStrategy {
+  status: "Expired";
+  priceAtOpen: string;
+  priceAtClose: string;
+  income: string;
+  breakoutRange: {
+    min: string;
+    max: string;
+  };
 }
 
-export interface Strategy {
-  id: string;
-  name: string;
-  description: string;
-  isActive: boolean;
-  createdAt: string;
-  totalTrades: number;
-  winRate: number;
-}
+// Union type for all strategy statuses
+export type Strategy = OpenStrategy | ActiveStrategy | ExpiredStrategy;
 
 export interface StrategiesResponse {
   strategies: Strategy[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
 export interface ReferralInfo {
@@ -144,68 +157,11 @@ class ApiService {
 
     return this.request<TradingStatsResponse>("/trading/stats", { headers });
   }
+  
 
-
-  async getMyTrades(
-    signature: string,
-    address: string,
-    page: number = 1,
-    limit: number = 10,
-    status: "active" | "finished" = "finished"
-  ): Promise<TradesResponse> {
-    const headers: Record<string, string> = {
-      Authorization: `Bearer ${signature}`,
-      "x-address": address,
-    };
-
-    const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
-      status,
-    });
-
-    return this.request<TradesResponse>(
-      `/trading/my-trades?${params.toString()}`,
-      { headers }
-    );
+  async getStrategies(): Promise<StrategiesResponse> {
+    return this.request<StrategiesResponse>("/trading/strategies");
   }
-
-  async getAllTrades(
-    signature: string,
-    address: string,
-    page: number = 1,
-    limit: number = 20,
-    status: "active" | "finished" = "finished"
-  ): Promise<TradesResponse> {
-    const headers: Record<string, string> = {
-      Authorization: `Bearer ${signature}`,
-      "x-address": address,
-    };
-
-    const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
-      status,
-    });
-
-    return this.request<TradesResponse>(
-      `/trading/trades?${params.toString()}`,
-      { headers }
-    );
-  }
-
-  async getStrategies(
-    signature: string,
-    address: string
-  ): Promise<StrategiesResponse> {
-    const headers: Record<string, string> = {
-      Authorization: `Bearer ${signature}`,
-      "x-address": address,
-    };
-
-    return this.request<StrategiesResponse>("/trading/strategies", { headers });
-  }
-
 }
 
 export const apiService = new ApiService();

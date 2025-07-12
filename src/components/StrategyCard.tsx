@@ -3,42 +3,39 @@ import styled from "@emotion/styled";
 import { Column, Row } from "./Flex";
 import SizedBox from "./SizedBox";
 import Button from "./Button";
+import userIcon from "../assets/icons/user.svg";
+import strategyChartIcon from "../assets/icons/strategyChart.svg";
 import starsIcon from "../assets/icons/stars.svg";
-import plusIcon from "../assets/icons/plus.svg";
+import type { Strategy } from "../services/api";
+import dayjs from "dayjs";
+import BN from "../utils/BN";
 
 // Типы пропсов
 export type StrategyCardProps = {
-  title: string;
-  status: "in progress" | "finished";
-  yieldPercent: string;
-  amount: string;
-  asset: string;
-  income?: string;
-  incomeChange?: string;
-  expiration: string;
+  strategy: Strategy;
   onClaim?: () => void;
-  onInvest?: () => void;
-  chartSrc?: string;
 };
 
-const Card = styled.div`
+const Card = styled.div<{ status: "Active" | "Open" | "Expired" }>`
   display: flex;
   flex-direction: column;
   position: relative;
 
   border-radius: 32px;
-  padding: 28px 16px;
+  padding: 24px 16px;
   box-sizing: border-box;
   border: 2px solid transparent;
   border-radius: 32px;
 
-  /* слой 1 — заливка, слой 2 — градиент */
-  background-image: linear-gradient(#000, #000),
-    /* fill   */ linear-gradient(135deg, #19f096 0%, #6aacff 60%, #8f4af5 100%); /* border */
-
-  /* говорим, где рисовать слои */
-  background-origin: padding-box, border-box;
-  background-clip: padding-box, border-box;
+  /* если статус Expired, фон #222024, иначе градиент */
+  background: ${({ status }) =>
+    status === "Expired"
+      ? "#222024"
+      : "linear-gradient(#000, #000), linear-gradient(135deg, #19f096 0%, #6aacff 60%, #8f4af5 100%)"};
+  background-origin: ${({ status }) =>
+    status === "Expired" ? "padding-box" : "padding-box, border-box"};
+  background-clip: ${({ status }) =>
+    status === "Expired" ? "padding-box" : "padding-box, border-box"};
 `;
 
 const Title = styled.div`
@@ -46,14 +43,11 @@ const Title = styled.div`
   font-size: 50px;
   font-style: italic;
   font-weight: 400;
-  line-height: 125%; /* 62.5px */
-  letter-spacing: -1px;
-  line-height: 105%; /* 50.4px */
-  letter-spacing: -0.96px;
+  line-height: 100%;
   z-index: 1;
 `;
 
-const Status = styled.span<{ status: string }>`
+const BasicBadge = styled.span`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -62,20 +56,34 @@ const Status = styled.span<{ status: string }>`
   font-size: 12px;
   font-style: normal;
   font-weight: 500;
-  line-height: 140%; /* 16.8px */
+  line-height: 100%;
   letter-spacing: -0.12px;
 
   height: 24px;
   padding: 0 8px;
 
   border-radius: 16px;
-  background: ${({ status }) =>
-    status === "in progress" ? "#19F096" : "transparent"};
-  color: ${({ status }) => (status === "in progress" ? "#000" : "#9A45FE")};
-  border: 1px solid
-    ${({ status }) => (status === "in progress" ? "#19F096" : "#9A45FE")};
   box-sizing: border-box;
   z-index: 1;
+`;
+
+const Status = styled(BasicBadge)<{ status: "Active" | "Open" | "Expired" }>`
+  background: ${({ status }) =>
+    status === "Open"
+      ? "#70EC9E"
+      : status === "Expired"
+      ? "#4E4C51"
+      : "#8F4AF5"};
+  color: ${({ status }) => (status === "Open" ? "#000" : "#fff")};
+  border: 1px solid
+    ${({ status }) => (status === "Open" ? "#70EC9E" : "#222024")};
+`;
+
+const ProfitBadge = styled(BasicBadge)<{ status: "profit" | "loss" }>`
+  background: transparent;
+  color: ${({ status }) => (status === "profit" ? "#70EC9E" : "#ED5959")};
+  border: 1px solid
+    ${({ status }) => (status === "profit" ? "#70EC9E" : "#ED5959")};
 `;
 
 const Text = styled.div`
@@ -83,109 +91,209 @@ const Text = styled.div`
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
-  line-height: 140%; /* 22.4px */
-  letter-spacing: -0.16px;
   z-index: 1;
 `;
 
-const ExpirationTitle = styled(Text)`
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: -0.12px;
-  margin-bottom: 8px;
-`;
-
-const ValueTitle = styled(Title)`
+const ValueTitle = styled(Title)<{ color?: string }>`
+  color: ${({ color }) => color};
   font-style: normal;
 `;
 
-const ChangePercentText = styled(ValueTitle)<{ isNegative?: boolean }>`
-  font-size: 24px;
-  line-height: 140%;
-  letter-spacing: -0.48px;
-  color: ${({ isNegative }) => (isNegative ? "#9A45FE" : "#19F096")};
-`;
+// const ChangePercentText = styled(ValueTitle)<{ isNegative?: boolean }>`
+//   font-size: 24px;
+//   line-height: 140%;
+//   letter-spacing: -0.48px;
+//   color: ${({ isNegative }) => (isNegative ? "#9A45FE" : "#19F096")};
+// `;
 
-const StyledButton = styled(Button)`
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
-  max-width: 110px;
-  z-index: 1;
-`;
+// const StyledButton = styled(Button)`
+//   position: absolute;
+//   right: 16px;
+//   bottom: 16px;
+//   max-width: 110px;
+//   z-index: 1;
+// `;
 const ChartImage = styled.img`
   position: absolute;
   right: 16px;
-  bottom: 16px;
+  top: 126px;
   z-index: 0;
 `;
 
 export const StrategyCard: React.FC<StrategyCardProps> = ({
-  title,
-  status,
-  yieldPercent,
-  amount,
-  asset,
-  income,
-  incomeChange,
-  expiration,
+  strategy,
   onClaim,
-  onInvest,
-  chartSrc,
-}) => (
-  <Card>
-    <Row justifyContent="space-between">
-      <Column>
-        <Title>{title}</Title>
-        <Status status={status}>
-          {status === "in progress" ? "in progress" : "finished"}
-        </Status>
+}) => {
+  const expiration = dayjs(strategy.expiration).format("DD.MM.YYYY");
+  // Countdown to depositUntil
+  const [timeLeft, setTimeLeft] = React.useState<string>("");
+  const income =
+    strategy.status === "Expired"
+      ? BN.formatUnits(strategy.income, 18)
+      : BN.ZERO;
+
+  // Calculate the percentage change from open to close price
+  const percentChange =
+    strategy.status === "Expired" && strategy.priceAtOpen
+      ? ((Number(strategy.priceAtClose) - Number(strategy.priceAtOpen)) /
+          Number(strategy.priceAtOpen)) *
+        100
+      : 0;
+
+  // Calculate profit percentage when expired and profit > 0
+  const profitPercentage =
+    strategy.status === "Expired" && income.gt(0)
+      ? (Number(income.toString()) / 0.006) * 100
+      : 0;
+
+  React.useEffect(() => {
+    function updateCountdown() {
+      const now = dayjs();
+      const end = dayjs(strategy.depositUntil);
+      const diff = end.diff(now);
+
+      if (diff <= 0) {
+        setTimeLeft("0d 0h 0m");
+        return;
+      }
+
+      const days = end.diff(now, "day");
+      const hours = end.subtract(days, "day").diff(now, "hour");
+      const minutes = end
+        .subtract(days, "day")
+        .subtract(hours, "hour")
+        .diff(now, "minute");
+
+      let timeString = "";
+      if (days > 0) timeString += `${days}d `;
+      if (hours > 0) timeString += `${hours}h `;
+      if (minutes > 0) timeString += `${minutes}m`;
+      setTimeLeft(timeString.trim() || "0m");
+    }
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000 * 60); // update every minute
+
+    return () => clearInterval(interval);
+  }, [strategy.depositUntil]);
+
+  const volatilityColor =
+    strategy.estimatedVolatility === "Low"
+      ? "#ED5959" // red
+      : strategy.estimatedVolatility === "Medium"
+      ? "#FF8D44" // yellow
+      : strategy.estimatedVolatility === "High"
+      ? "#70EC9E" // green
+      : undefined;
+  return (
+    <Card status={strategy.status}>
+      <Row justifyContent="space-between" alignItems="center">
+        <Title>{strategy.title}</Title>
+        <Column alignItems="flex-end">
+          <Text style={{ fontSize: 12, fontWeight: 500 }}>Expiration day</Text>
+          <Text style={{ fontWeight: 600 }}>{expiration}</Text>
+        </Column>
+      </Row>
+      <SizedBox height={8} />
+      <Row alignItems="center">
+        <Status status={strategy.status}>{strategy.status}</Status>
+        <SizedBox width={8} />
+        {strategy.status !== "Expired" ? (
+          <>
+            <img src={userIcon} alt="user" />
+            <SizedBox width={4} />
+            <Text style={{ fontSize: 12, fontWeight: 500 }}>
+              {strategy.participants} 🔥
+            </Text>
+          </>
+        ) : (
+          <ProfitBadge status={income.gt(0) ? "profit" : "loss"}>
+            {income.gt(0) ? "Profit" : "Loss"}
+          </ProfitBadge>
+        )}
+      </Row>
+      <SizedBox height={32} />
+      <Column crossAxisSize="max">
+        {strategy.status === "Open" && (
+          <>
+            <ValueTitle style={{ color: volatilityColor }}>
+              {strategy.estimatedVolatility}
+            </ValueTitle>
+            <Text>Volatility</Text>
+            <SizedBox height={24} />
+            <ValueTitle>{timeLeft}</ValueTitle>
+            <Text>Time remaining</Text>
+          </>
+        )}
+        {strategy.status === "Active" && (
+          <>
+            <ValueTitle>${strategy.priceAtOpen}</ValueTitle>
+            <Text>{strategy.symbol} price at open</Text>
+            <SizedBox height={24} />
+            <ValueTitle>
+              ${strategy.breakoutRange.min}-${strategy.breakoutRange.max}
+            </ValueTitle>
+            <Text>Breakout range</Text>
+          </>
+        )}
+        {strategy.status === "Expired" && (
+          <>
+            <Row alignItems="flex-end">
+              <ValueTitle>
+                ${income.toSignificant(4).toFormat()}&nbsp;
+              </ValueTitle>
+              {profitPercentage > 0 && (
+                <ValueTitle
+                  style={{ fontSize: 24, paddingBottom: 4 }}
+                  color="#70EC9E"
+                >
+                  {profitPercentage.toFixed(2)}%
+                </ValueTitle>
+              )}
+            </Row>
+            <Text>{strategy.symbol} income</Text>
+            <SizedBox height={24} />
+            <Row justifyContent="space-between">
+              <Column>
+                <Row>
+                  <ValueTitle style={{ fontSize: 24 }}>
+                    ${strategy.priceAtClose} &nbsp;
+                  </ValueTitle>
+                  <ValueTitle
+                    style={{ fontSize: 24 }}
+                    color={percentChange > 0 ? "#70EC9E" : "#ED5959"}
+                  >
+                    {percentChange.toFixed(2)}%
+                  </ValueTitle>
+                </Row>
+                <Text>{strategy.symbol} price at close</Text>
+              </Column>
+              <Column>
+                <ValueTitle style={{ fontSize: 24 }}>
+                  ${strategy.breakoutRange.min}-{strategy.breakoutRange.max}
+                </ValueTitle>
+                <Text>Breakout range</Text>
+              </Column>
+            </Row>
+          </>
+        )}
       </Column>
-      <Column alignItems="flex-end">
-        <ExpirationTitle>Expiration day</ExpirationTitle>
-        <Text>{expiration}</Text>
-      </Column>
-    </Row>
-    <SizedBox height={32} />
-    <Column>
-      {status === "in progress" ? (
-        <>
-          <ValueTitle>{yieldPercent}</ValueTitle>
-          <Text>Potential yield</Text>
-          {/* <SizedBox height={24} /> */}
-          <ValueTitle>${amount}</ValueTitle>
-          <Text>{asset} grows over</Text>
-        </>
-      ) : (
-        <>
-          <Row alignItems="flex-end">
-            <ValueTitle>{income}</ValueTitle>
-            <SizedBox width={8} />
-            <ChangePercentText isNegative={incomeChange?.startsWith("-")}>
-              {incomeChange}
-            </ChangePercentText>
-          </Row>
-          <Text>{asset} Income</Text>
-          {/* <SizedBox height={24} /> */}
-          <ValueTitle>${amount}</ValueTitle>
-          <Text>{asset} grows over</Text>
-        </>
+      {strategy.status === "Open" && (
+        <Button style={{ marginTop: 24 }}>Join + </Button>
       )}
-    </Column>
-    {onClaim && (
-      <StyledButton onClick={onClaim}>
-        Claim &nbsp;
-        <img src={starsIcon} alt="starsIcon" />
-      </StyledButton>
-    )}{" "}
-    {onInvest && (
-      <StyledButton onClick={onInvest}>
-        Invest &nbsp;
-        <img src={plusIcon} alt="plusIcon" />
-      </StyledButton>
-    )}
-    {chartSrc && <ChartImage src={chartSrc} alt="chart" />}
-  </Card>
-);
+
+      {onClaim && (
+        <Button style={{ marginTop: 24 }}>
+          Claim&nbsp;
+          <img src={starsIcon} alt="stars" />
+        </Button>
+      )}
+
+      {strategy.status !== "Expired" && (
+        <ChartImage src={strategyChartIcon} alt="chart" />
+      )}
+    </Card>
+  );
+};
 
 export default StrategyCard;
