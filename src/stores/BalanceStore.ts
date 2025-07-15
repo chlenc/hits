@@ -12,18 +12,23 @@ type TBalance = {
   isNative?: boolean;
   balance: number;
 };
+
 class BalanceStore {
   public readonly rootStore: RootStore;
   balances: Record<string, TBalance> = {};
   prices: Record<string, number> = {};
+  initialized: boolean = false;
 
+  setBalances = (balances: Record<string, TBalance>) => this.balances = balances;
+  
+  setInitialized = (initialized: boolean) => (this.initialized = initialized);
   constructor(rootStore: RootStore, _initState?: any) {
     this.rootStore = rootStore;
     makeAutoObservable(this);
 
     reaction(
-      () => [rootStore.accountStore.address],
-      () => this.updateTokenBalances(),
+      () => [rootStore.accountStore.address, rootStore.accountStore.chainId],
+      () => this.updateTokenBalances().then(() => this.setInitialized(true)),
       { fireImmediately: true }
     );
 
@@ -77,18 +82,16 @@ class BalanceStore {
         args: [address as `0x${string}`],
       });
 
-      runInAction(() => {
-        balances.TICKET = {
-          balance: Number(ticketBalance),
-          decimals: 0,
-          symbol: "TICKET",
-          isNative: false,
-        };
-      });
+      balances.TICKET = {
+        balance: Number(ticketBalance),
+        decimals: 0,
+        symbol: "TICKET",
+        isNative: false,
+      };
     } catch (error) {
       console.error("Error fetching ticket balance:", error);
     }
-    runInAction(() => (this.balances = balances));
+    runInAction(() => this.setBalances(balances));
   };
 
   updateTokenPriceUSD = async () => {
@@ -118,7 +121,9 @@ class BalanceStore {
       }
     });
 
-    runInAction(() => (this.prices = tokenPrices));
+    runInAction(() => {
+      this.prices = tokenPrices;
+    });
   };
 }
 

@@ -59,7 +59,11 @@ const Main: React.FC = observer(() => {
     <StyledPageContainer>
       <Row justifyContent="space-between" alignItems="center">
         <PageTitle>Main</PageTitle>
-        <ConnectButton />
+        <ConnectButton
+          showBalance={true}
+          accountStatus="avatar"
+          chainStatus="icon"
+        />
       </Row>
       <Column crossAxisSize="max">
         <BlockTitle>Claimable Balance</BlockTitle>

@@ -22,6 +22,7 @@ import Trades from "./pages/Trades";
 import Strategies from "./pages/Strategies";
 import About from "./pages/About";
 import Invest from "./pages/Invest";
+import Strategy from "./pages/PaymentScreen";
 import { ToastContainer } from "react-toastify";
 
 const Wrapper = styled.div`
@@ -67,7 +68,8 @@ function AppRoutes() {
   const location = useLocation();
   // Определяем активный таб по location.pathname
   let active =
-    pages.find((p) => location.pathname.startsWith(p.path))?.label || "Trades";
+    pages.find((p) => location.pathname.startsWith(p.path))?.label ||
+    "Strategies";
   return (
     <Wrapper>
       <Routes>
@@ -81,6 +83,7 @@ function AppRoutes() {
         <Route path="/about" element={<About />} />
         <Route path="/refferal" element={<Refferal />} />
         <Route path="/invest" element={<Invest />} />
+        <Route path="/strategy/:id" element={<Strategy />} />
         <Route path="*" element={<Navigate to="/strategies" replace />} />
       </Routes>
       <BottomNavWrapper>
@@ -105,9 +108,10 @@ export default function App() {
             locale="en"
             modalSize="compact"
             theme={darkTheme({
-              accentColor: "#212121",
+              accentColor:
+                "linear-gradient(114deg, #E478FE 17.57%, #9A45FE 81.44%)",
               accentColorForeground: "white",
-              borderRadius: "medium",
+              borderRadius: "large",
               fontStack: "system",
             })}
             initialChain={wagmiConfig.chains[0]}
@@ -115,7 +119,7 @@ export default function App() {
             <storesContext.Provider value={mobxStore}>
               <_SyncDataFromHook_ />
               <AppRoutes />
-              <ToastContainer  />
+              <ToastContainer />
             </storesContext.Provider>
           </RainbowKitProvider>
         </QueryClientProvider>

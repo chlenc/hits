@@ -1,6 +1,6 @@
 import type { Config } from "wagmi";
 import { NetworkConfig } from "../configs/networkConfig";
-import { makeAutoObservable, reaction } from "mobx";
+import { makeAutoObservable, reaction, runInAction } from "mobx";
 import { disconnect } from "@wagmi/core";
 import {
   apiService,
@@ -126,7 +126,9 @@ class AccountStore {
   private async authenticateUser() {
     const { address, chainId, wagmiConfig } = this.rootStore.accountStore;
     if (!address || this.isAuthenticating || !wagmiConfig || !chainId) return;
-    this.isAuthenticating = true;
+    runInAction(() => {
+      this.isAuthenticating = true;
+    });
 
     try {
       const { message } = await apiService.getAuthMessage();
@@ -137,9 +139,12 @@ class AccountStore {
           chain: base,
           transport: custom(window.ethereum),
         });
-        this.signatures[address] = await walletClient.signMessage({
+        const signed = await walletClient.signMessage({
           message,
           account: address,
+        });
+        runInAction(() => {
+          this.signatures[address] = signed;
         });
         signature = this.signatures[address];
       }
@@ -148,16 +153,22 @@ class AccountStore {
         address,
         this.referrer
       );
-      this.userData = userData;
       const { referrals } = await apiService.getReferrals(signature, address);
-      this.refferals = referrals;
+      runInAction(() => {
+        this.userData = userData;
+        this.refferals = referrals;
+      });
     } catch (error: any) {
       const errorMessage = error.shortMessage ?? error.toString();
       toast.error(errorMessage);
-      this.referrer = undefined;
+      runInAction(() => {
+        this.referrer = undefined;
+      });
       disconnect(wagmiConfig);
     } finally {
-      this.isAuthenticating = false;
+      runInAction(() => {
+        this.isAuthenticating = false;
+      });
     }
   }
 

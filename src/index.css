@@ -61,3 +61,12 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
+
+/* RainbowKit modal gray text override */
+.rk-modal-subtitle, /* Installed/Popular/Recent */
+.rk-wallet-list-section-title, /* Section titles */
+.rk-link, /* Learn More */
+.rk-text, /* fallback for general text */
+.rk-wallet-list-wallet-recent-label {
+  color: #fff !important;
+}

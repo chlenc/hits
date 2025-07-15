@@ -9,6 +9,8 @@ import starsIcon from "../assets/icons/stars.svg";
 import type { Strategy } from "../services/api";
 import dayjs from "dayjs";
 import BN from "../utils/BN";
+import { useNavigate } from "react-router-dom";
+import updateCountdown from "../utils/updateCountdown";
 
 // Типы пропсов
 export type StrategyCardProps = {
@@ -124,6 +126,8 @@ export const StrategyCard: React.FC<StrategyCardProps> = ({
   strategy,
   onClaim,
 }) => {
+  const navigate = useNavigate();
+
   const expiration = dayjs(strategy.expiration).format("DD.MM.YYYY");
   // Countdown to depositUntil
   const [timeLeft, setTimeLeft] = React.useState<string>("");
@@ -147,32 +151,11 @@ export const StrategyCard: React.FC<StrategyCardProps> = ({
       : 0;
 
   React.useEffect(() => {
-    function updateCountdown() {
-      const now = dayjs();
-      const end = dayjs(strategy.depositUntil);
-      const diff = end.diff(now);
-
-      if (diff <= 0) {
-        setTimeLeft("0d 0h 0m");
-        return;
-      }
-
-      const days = end.diff(now, "day");
-      const hours = end.subtract(days, "day").diff(now, "hour");
-      const minutes = end
-        .subtract(days, "day")
-        .subtract(hours, "hour")
-        .diff(now, "minute");
-
-      let timeString = "";
-      if (days > 0) timeString += `${days}d `;
-      if (hours > 0) timeString += `${hours}h `;
-      if (minutes > 0) timeString += `${minutes}m`;
-      setTimeLeft(timeString.trim() || "0m");
-    }
-
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000 * 60); // update every minute
+    updateCountdown(strategy.depositUntil, setTimeLeft);
+    const interval = setInterval(
+      () => updateCountdown(strategy.depositUntil, setTimeLeft),
+      1000 * 60
+    ); // update every minute
 
     return () => clearInterval(interval);
   }, [strategy.depositUntil]);
@@ -279,7 +262,12 @@ export const StrategyCard: React.FC<StrategyCardProps> = ({
         )}
       </Column>
       {strategy.status === "Open" && (
-        <Button style={{ marginTop: 24 }}>Join + </Button>
+        <Button
+          onClick={() => navigate(`/strategy/${strategy.id}`)}
+          style={{ marginTop: 24 }}
+        >
+          Join +{" "}
+        </Button>
       )}
 
       {onClaim && (

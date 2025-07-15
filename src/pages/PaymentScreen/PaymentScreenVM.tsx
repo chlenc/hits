@@ -6,18 +6,18 @@ import { useStores } from "../../stores/useStores";
 import { useVM } from "../../stores/useVM";
 import BN from "../../utils/BN";
 
-const ctx = React.createContext<PresaleVM | null>(null);
-export const PresaleVMProvider: React.FC<PropsWithChildren> = ({
+const ctx = React.createContext<PaymentScreenVM | null>(null);
+export const PaymentScreenVMProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
   const rootStore = useStores();
-  const store = useMemo(() => new PresaleVM(rootStore), [rootStore]);
+  const store = useMemo(() => new PaymentScreenVM(rootStore), [rootStore]);
   return <ctx.Provider value={store}>{children}</ctx.Provider>;
 };
 
-export const usePresaleVM = () => useVM(ctx);
+export const usePaymentScreenVM = () => useVM(ctx);
 
-class PresaleVM {
+class PaymentScreenVM {
   public rootStore: RootStore;
 
   // State
@@ -44,15 +44,12 @@ class PresaleVM {
 
   resetTicketAmount = () => (this.ticketAmount = 1);
 
-  get ticketBalance() {
+  get cashback() {
     const balances = this.rootStore.balanceStore.balances;
-    return BN.formatUnits(balances.TICKET?.balance ?? 0)
-      .div(TICKET_PRICE)
-      .toNumber();
+    return BN.formatUnits(balances.TICKET?.balance ?? 0).toNumber();
   }
 
   get ethBalance() {
     return this.rootStore.balanceStore.balances.ETH?.balance ?? 0;
   }
-
 }

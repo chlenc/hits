@@ -14,6 +14,7 @@ import { useStores } from "../stores/useStores";
 import { useWalletConnectRedirect } from "../hooks/useWalletConnectRedirect";
 import centerEllipsis from "../utils/centerEllipsis";
 import { copyToClipboard } from "../utils/copyToClipboard";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const SectionTitle = styled.h5`
   font-family: "Instrument Sans";
@@ -47,7 +48,14 @@ const Referrals: React.FC = observer(() => {
 
   return (
     <PageContainer>
-      <PageTitle>Referrals</PageTitle>
+      <Row justifyContent="space-between" alignItems="center">
+        <PageTitle>Referrals</PageTitle>
+        <ConnectButton
+          showBalance={true}
+          accountStatus="avatar"
+          chainStatus="icon"
+        />
+      </Row>
       <Section>
         <SectionTitle>My referral link</SectionTitle>
         <SizedBox height={24} />
