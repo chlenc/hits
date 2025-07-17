@@ -1,6 +1,5 @@
 import { makeAutoObservable } from "mobx";
 import React, { type PropsWithChildren, useMemo } from "react";
-import { TICKET_PRICE } from "../../configs/networkConfig";
 import RootStore from "../../stores/RootStore";
 import { useStores } from "../../stores/useStores";
 import { useVM } from "../../stores/useVM";

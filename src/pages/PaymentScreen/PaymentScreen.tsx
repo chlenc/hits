@@ -1,30 +1,27 @@
 import styled from "@emotion/styled";
 import { ConnectButton, useConnectModal } from "@rainbow-me/rainbowkit";
+import dayjs from "dayjs";
 import { observer } from "mobx-react-lite";
 import React from "react";
-import { useSendTransaction, useConfig } from "wagmi";
+import { useNavigate, useParams } from "react-router-dom";
+import { useConfig, useSendTransaction } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import arrowIcon from "../../assets/icons/arrow.svg";
-import ticketIcon from "../../assets/icons/ticket.svg";
 import walletIcon from "../../assets/icons/wallet.svg";
 import tickerPicture from "../../assets/images/ticketPreview.svg";
 import Button from "../../components/Button";
 import { Row } from "../../components/Flex";
+import Loading from "../../components/Loading";
 import PageContainer from "../../components/PageContainer";
 import PageTitle from "../../components/PageTitle";
 import Section from "../../components/Section";
 import SizedBox from "../../components/SizedBox";
+import Switch from "../../components/Switch";
 import { TICKET_PRICE } from "../../configs/networkConfig";
 import { useStores } from "../../stores/useStores";
 import BN from "../../utils/BN";
-import { useWalletConnectRedirect } from "../../hooks/useWalletConnectRedirect";
-import { PaymentScreenVMProvider, usePaymentScreenVM } from "./PaymentScreenVM";
-import { useParams } from "react-router-dom";
-import dayjs from "dayjs";
 import updateCountdown from "../../utils/updateCountdown";
-import { useNavigate } from "react-router-dom";
-import Loading from "../../components/Loading";
-import Switch from "../../components/Switch";
+import { PaymentScreenVMProvider, usePaymentScreenVM } from "./PaymentScreenVM";
 
 const SectionTitle = styled.h5`
   font-family: "Instrument Sans";
