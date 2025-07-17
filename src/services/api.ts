@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:3000";
+const API_BASE_URL = "https://api.hits4.fun";
 
 export interface AuthMessageResponse {
   message: string;
@@ -157,7 +157,6 @@ class ApiService {
 
     return this.request<TradingStatsResponse>("/trading/stats", { headers });
   }
-  
 
   async getStrategies(): Promise<StrategiesResponse> {
     return this.request<StrategiesResponse>("/trading/strategies");
