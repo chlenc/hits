@@ -159,8 +159,13 @@ class AccountStore {
         this.refferals = referrals;
       });
     } catch (error: any) {
+      console.log({ error });
       const errorMessage = error.shortMessage ?? error.toString();
-      if (address && errorMessage.includes("401 Unauthorized")) {
+      if (
+        address &&
+        (errorMessage.includes("401 Unauthorized") ||
+          errorMessage.includes("API request failed: 401"))
+      ) {
         runInAction(() => {
           delete this.signatures[address];
         });
