@@ -73,12 +73,12 @@ class AccountStore {
       { fireImmediately: true }
     );
 
-    console.log({
-      initState: initState?.referrer,
-      signatures: JSON.stringify(this.signatures),
-      url: extractReferralFromURL(),
-      referrer: this.referrer,
-    });
+    // console.log({
+    //   initState: initState?.referrer,
+    //   signatures: JSON.stringify(this.signatures),
+    //   url: extractReferralFromURL(),
+    //   referrer: this.referrer,
+    // });
   }
 
   setAddress = (address?: `0x${string}`) => (this.address = address);
@@ -159,7 +159,7 @@ class AccountStore {
         this.refferals = referrals;
       });
     } catch (error: any) {
-      console.log({ error });
+      console.error({ error });
       const errorMessage = error.shortMessage ?? error.toString();
       if (
         address &&
