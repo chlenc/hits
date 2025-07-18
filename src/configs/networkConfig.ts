@@ -7,7 +7,7 @@ export const NETWORKS = {
   // ARBITRUM = "arbitrum",
 };
 
-export const TICKET_PRICE = 0.006;
+export const TICKET_PRICE = 0.005;
 
 export const COINS = {
   ETH: "ETH",

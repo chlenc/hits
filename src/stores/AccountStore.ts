@@ -160,7 +160,14 @@ class AccountStore {
       });
     } catch (error: any) {
       const errorMessage = error.shortMessage ?? error.toString();
-      toast.error(errorMessage);
+      if (address && errorMessage.includes("401 Unauthorized")) {
+        runInAction(() => {
+          delete this.signatures[address];
+        });
+        toast.error("Signature expired. Please sign in again.");
+      } else {
+        toast.error(errorMessage);
+      }
       runInAction(() => {
         this.referrer = undefined;
       });

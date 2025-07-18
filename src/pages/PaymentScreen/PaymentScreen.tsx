@@ -202,13 +202,9 @@ const PaymentImpl: React.FC = observer(() => {
         />
       </Row>
       <SubTitle>
-        {strategy?.estimatedVolatility === "High"
-          ? "High volatility"
-          : strategy?.estimatedVolatility === "Medium"
-          ? "Medium volatility"
-          : "Low volatility"}{" "}
-        {strategy?.symbol} should grows or falls over until{" "}
-        {dayjs(strategy?.expiration).format("DD.MM.YYYY")}
+        Given {strategy?.estimatedVolatility?.toLocaleLowerCase()} volatility,
+        will {strategy?.symbol} rise or fall by{" "}
+        {dayjs("2025-07-19").format("DD.MM.YYYY")}?
       </SubTitle>
       <Section>
         <SectionTitle>Buy tickets</SectionTitle>
