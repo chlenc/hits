@@ -8,8 +8,6 @@ import {
   type TradingStatsResponse,
 } from "../services/api";
 import RootStore from "./RootStore";
-import { createWalletClient, custom } from "viem";
-import { base } from "viem/chains";
 import { toast } from "react-toastify";
 
 export interface IAccountStoreInitState {
@@ -53,14 +51,6 @@ class AccountStore {
       this.referrer = referralFromURL;
     }
 
-    // Автоматическая аутентификация при подключении кошелька
-    reaction(
-      () => [this.isConnected, this.address],
-      ([isConnected, address]) => {
-        if (isConnected && address) this.authenticateUser();
-      },
-      { fireImmediately: true }
-    );
 
     // Автоматическая загрузка  stats после успешной аутентификации
     reaction(
@@ -88,6 +78,24 @@ class AccountStore {
   setTradingStats = (stats: TradingStatsResponse) =>
     (this.tradingStats = stats);
   setLoading = (loading: boolean) => (this.isLoading = loading);
+
+  // Метод для вызова аутентификации из компонента с wagmi хуком
+  triggerAuthentication = (walletClient?: any) => {
+    console.log("triggerAuthentication called", {
+      isConnected: this.isConnected,
+      address: this.address,
+      isAuthenticating: this.isAuthenticating,
+      hasWalletClient: !!walletClient,
+    });
+
+    if (this.isConnected && this.address && !this.isAuthenticating) {
+      console.log("Starting authentication with wallet client");
+      this.authenticateUser(walletClient);
+    } else {
+      console.log("Authentication conditions not met");
+    }
+  };
+
   get networkConfig() {
     return Object.values(NetworkConfig).find(
       (network) => network.chainId === this.chainId
@@ -123,9 +131,22 @@ class AccountStore {
     }
   }
 
-  private async authenticateUser() {
+  private async authenticateUser(walletClient?: any) {
     const { address, chainId, wagmiConfig } = this.rootStore.accountStore;
-    if (!address || this.isAuthenticating || !wagmiConfig || !chainId) return;
+
+    console.log("authenticateUser called", {
+      address,
+      isAuthenticating: this.isAuthenticating,
+      hasWagmiConfig: !!wagmiConfig,
+      chainId,
+      hasWalletClient: !!walletClient,
+    });
+
+    if (!address || this.isAuthenticating || !wagmiConfig || !chainId) {
+      console.log("Authentication conditions not met in authenticateUser");
+      return;
+    }
+
     runInAction(() => {
       this.isAuthenticating = true;
     });
@@ -134,11 +155,11 @@ class AccountStore {
       const { message } = await apiService.getAuthMessage();
       let signature = this.signatures[address];
       if (!signature) {
-        const walletClient = createWalletClient({
-          account: address,
-          chain: base,
-          transport: custom(window.ethereum),
-        });
+        if (!walletClient) {
+          console.error("No wallet client provided");
+          return;
+        }
+
         const signed = await walletClient.signMessage({
           message,
           account: address,

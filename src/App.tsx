@@ -10,7 +10,13 @@ import {
   Routes,
   useLocation,
 } from "react-router-dom";
-import { useAccount, useChainId, useConfig, WagmiProvider } from "wagmi";
+import {
+  useAccount,
+  useChainId,
+  useConfig,
+  useWalletClient,
+  WagmiProvider,
+} from "wagmi";
 import { wagmiConfig } from "./configs/wagmiConfig";
 import RootStore from "./stores/RootStore";
 import { storesContext, useStores } from "./stores/useStores";
@@ -117,7 +123,7 @@ export default function App() {
             initialChain={wagmiConfig.chains[0]}
           >
             <storesContext.Provider value={mobxStore}>
-              <_SyncDataFromHook_ />
+              <_WalletAuth />
               <AppRoutes />
               <ToastContainer />
             </storesContext.Provider>
@@ -128,11 +134,12 @@ export default function App() {
   );
 }
 
-// Separate component to handle account sync inside WagmiProvider
-const _SyncDataFromHook_ = observer(() => {
+const _WalletAuth: React.FC = observer(() => {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const config = useConfig();
+  const { data: walletClient } = useWalletClient();
+
   const { accountStore } = useStores();
 
   useEffect(() => {
@@ -140,7 +147,31 @@ const _SyncDataFromHook_ = observer(() => {
     accountStore.setIsConnected(isConnected);
     accountStore.setChainId(chainId);
     accountStore.setWagmiConfig(config);
-  }, [address, isConnected, chainId]);
+  }, [address, isConnected, chainId, config]);
 
-  return null;
+  useEffect(() => {
+    console.log("WalletAuth: checking auth conditions", {
+      isConnected: accountStore.isConnected,
+      address: accountStore.address,
+      hasWalletClient: !!walletClient,
+      isAuthenticating: accountStore.isAuthenticating,
+    });
+
+    if (
+      accountStore.isConnected &&
+      accountStore.address &&
+      walletClient &&
+      !accountStore.isAuthenticating
+    ) {
+      console.log("WalletAuth: triggering authentication");
+      accountStore.triggerAuthentication(walletClient);
+    }
+  }, [
+    accountStore.isConnected,
+    accountStore.address,
+    walletClient,
+    accountStore.isAuthenticating,
+  ]);
+
+  return null; // Этот компонент не рендерит ничего
 });
