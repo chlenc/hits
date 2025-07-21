@@ -51,7 +51,6 @@ class AccountStore {
       this.referrer = referralFromURL;
     }
 
-
     // Автоматическая загрузка  stats после успешной аутентификации
     reaction(
       () => [this.userData, this.address],
@@ -81,13 +80,6 @@ class AccountStore {
 
   // Метод для вызова аутентификации из компонента с wagmi хуком
   triggerAuthentication = (walletClient?: any) => {
-    console.log("triggerAuthentication called", {
-      isConnected: this.isConnected,
-      address: this.address,
-      isAuthenticating: this.isAuthenticating,
-      hasWalletClient: !!walletClient,
-    });
-
     if (this.isConnected && this.address && !this.isAuthenticating) {
       console.log("Starting authentication with wallet client");
       this.authenticateUser(walletClient);
@@ -133,14 +125,6 @@ class AccountStore {
 
   private async authenticateUser(walletClient?: any) {
     const { address, chainId, wagmiConfig } = this.rootStore.accountStore;
-
-    console.log("authenticateUser called", {
-      address,
-      isAuthenticating: this.isAuthenticating,
-      hasWagmiConfig: !!wagmiConfig,
-      chainId,
-      hasWalletClient: !!walletClient,
-    });
 
     if (!address || this.isAuthenticating || !wagmiConfig || !chainId) {
       console.log("Authentication conditions not met in authenticateUser");

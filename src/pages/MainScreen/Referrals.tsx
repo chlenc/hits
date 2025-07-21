@@ -1,20 +1,16 @@
 import styled from "@emotion/styled";
 import React from "react";
-import PageContainer from "../components/PageContainer";
-import PageTitle from "../components/PageTitle";
-import SizedBox from "../components/SizedBox";
-import Button from "../components/Button";
-import copyIcon from "../assets/icons/copy.svg";
-import { Column, Row } from "../components/Flex";
-import Input from "../components/Input";
-import Section from "../components/Section";
+import copyIcon from "../../assets/icons/copy.svg";
+import Button from "../../components/Button";
+import { Column, Row } from "../../components/Flex";
+import Input from "../../components/Input";
+import Section from "../../components/Section";
+import SizedBox from "../../components/SizedBox";
 // import starsIcon from "../assets/icons/stars.svg";
 import { observer } from "mobx-react-lite";
-import { useStores } from "../stores/useStores";
-import { useWalletConnectRedirect } from "../hooks/useWalletConnectRedirect";
-import centerEllipsis from "../utils/centerEllipsis";
-import { copyToClipboard } from "../utils/copyToClipboard";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useStores } from "../../stores/useStores";
+import centerEllipsis from "../../utils/centerEllipsis";
+import { copyToClipboard } from "../../utils/copyToClipboard";
 
 const SectionTitle = styled.h5`
   font-family: "Instrument Sans";
@@ -41,21 +37,8 @@ const SecondaryText = styled.div<{ align?: "left" | "right" | "center" }>`
 const Referrals: React.FC = observer(() => {
   const { accountStore } = useStores();
 
-  useWalletConnectRedirect({
-    redirectPath: "/strategies",
-    autoOpenModal: true,
-  });
-
   return (
-    <PageContainer>
-      <Row justifyContent="space-between" alignItems="center">
-        <PageTitle>Referrals</PageTitle>
-        <ConnectButton
-          showBalance={true}
-          accountStatus="avatar"
-          chainStatus="icon"
-        />
-      </Row>
+    <>
       <Section>
         <SectionTitle>My referral link</SectionTitle>
         <SizedBox height={24} />
@@ -92,7 +75,7 @@ const Referrals: React.FC = observer(() => {
         </Button> */}
         </Section>
       )}
-    </PageContainer>
+    </>
   );
 });
 

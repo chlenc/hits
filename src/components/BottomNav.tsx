@@ -1,35 +1,29 @@
 import React from "react";
 import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
-import HomeIcon from "../assets/icons/home.svg";
-import WalletIcon from "../assets/icons/wallet.svg";
-import TargetIcon from "../assets/icons/target.svg";
-import InfoIcon from "../assets/icons/info.svg";
-import LinkIcon from "../assets/icons/link.svg";
-
-const tabs = [
-  { label: "Main", icon: <img src={HomeIcon} alt="Home" />, path: "/main" },
-  {
-    label: "Trades",
-    icon: <img src={WalletIcon} alt="Wallet" />,
-    path: "/trades",
-  },
-  {
-    label: "Strategies",
-    icon: <img src={TargetIcon} alt="Target" />,
-    path: "/strategies",
-  },
-  { label: "About", icon: <img src={InfoIcon} alt="Info" />, path: "/about" },
-  {
-    label: "Refferal",
-    icon: <img src={LinkIcon} alt="Link" />,
-    path: "/refferal",
-  },
-];
+import { screens } from "../App";
 
 const activeColor = "#D67EF7";
 const inactiveColor = "#797A87";
 const bgColor = "#1A1A1A";
+
+const BottomNavWrapper = styled.div`
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 100;
+`;
+
+const BottomNavInner = styled.div`
+  width: 100%;
+  padding: 0 16px 32px 16px;
+  box-sizing: border-box;
+  pointer-events: all;
+`;
 
 const Nav = styled.nav`
   display: flex;
@@ -71,27 +65,29 @@ const Tab = styled.div<{ active: boolean }>`
   }
 `;
 
-export const BottomNav: React.FC<{ active?: string }> = ({
-  active = "Trades",
-}) => {
+export const BottomNav: React.FC<{ active?: string }> = ({ active }) => {
   const navigate = useNavigate();
 
   return (
-    <Nav>
-      {tabs.map((tab) => {
-        const isActive = tab.label === active;
-        return (
-          <Tab
-            key={tab.label}
-            active={isActive}
-            onClick={() => navigate(tab.path)}
-          >
-            {tab.icon}
-            <span>{tab.label}</span>
-          </Tab>
-        );
-      })}
-    </Nav>
+    <BottomNavWrapper>
+      <BottomNavInner>
+        <Nav>
+          {screens.map((tab) => {
+            const isActive = tab.label === active;
+            return (
+              <Tab
+                key={tab.label}
+                active={isActive}
+                onClick={() => navigate(tab.path)}
+              >
+                {tab.icon}
+                <span>{tab.label}</span>
+              </Tab>
+            );
+          })}
+        </Nav>
+      </BottomNavInner>
+    </BottomNavWrapper>
   );
 };
 
