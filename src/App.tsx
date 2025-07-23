@@ -42,7 +42,7 @@ export default function App() {
         <Route path="/strategies" element={<Strategies />} />
         <Route path="/about" element={<About />} />
         <Route path="/trades" element={<Trades />} />
-        <Route path="/strategy/:id" element={<Strategy />} />
+        <Route path="/payment" element={<Strategy />} />
         <Route path="*" element={<Navigate to="/strategies" replace />} />
       </Routes>
       <BottomNav active={active} />

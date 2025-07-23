@@ -26,9 +26,9 @@ export default function updateCountdown(
   //   .diff(now, "second");
 
   let timeString = "";
-  if (days > 0) timeString += `${days}d `;
-  if (hours > 0) timeString += `${hours}h `;
-  if (minutes > 0) timeString += `${minutes}m `;
+  if (days > 0) timeString += `${days} days `;
+  if (hours > 0) timeString += `${hours} hours `;
+  if (minutes > 0) timeString += `${minutes} mins `;
   // timeString += `${seconds}s`;
   setTimeLeft(timeString.trim());
 }

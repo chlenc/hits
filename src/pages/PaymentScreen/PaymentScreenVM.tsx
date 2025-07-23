@@ -4,6 +4,7 @@ import RootStore from "../../stores/RootStore";
 import { useStores } from "../../stores/useStores";
 import { useVM } from "../../stores/useVM";
 import BN from "../../utils/BN";
+import type { Strategy } from "../../services/api";
 
 const ctx = React.createContext<PaymentScreenVM | null>(null);
 export const PaymentScreenVMProvider: React.FC<PropsWithChildren> = ({
@@ -27,6 +28,19 @@ class PaymentScreenVM {
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore;
     makeAutoObservable(this);
+  }
+
+  get isComplianceError(): string | null {
+    if (!this.rootStore.accountStore.isCompliance) {
+      return "You are not compliant with the KYC/AML regulations";
+    }
+    return null;
+  }
+
+  get openStrategy(): Strategy | undefined {
+    return this.rootStore.strategiesStore.strategies.find(
+      (strategy) => strategy.status === "Open"
+    );
   }
 
   // Actions

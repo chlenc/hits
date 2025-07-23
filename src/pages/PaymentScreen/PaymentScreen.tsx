@@ -16,7 +16,6 @@ import PageContainer from "../../components/PageContainer";
 import PageTitle from "../../components/PageTitle";
 import Section from "../../components/Section";
 import SizedBox from "../../components/SizedBox";
-import Switch from "../../components/Switch";
 import { TICKET_PRICE } from "../../configs/networkConfig";
 import { useStores } from "../../stores/useStores";
 import BN from "../../utils/BN";
@@ -97,11 +96,10 @@ const PaymentImpl: React.FC = observer(() => {
   const { accountStore, balanceStore, strategiesStore } = useStores();
   const paymentVM = usePaymentScreenVM();
 
-  const { id: strategyId } = useParams<{ id: string }>();
-  const strategy = strategiesStore.getStrategyById(strategyId ?? "");
+  const strategy = paymentVM.openStrategy;
 
   const [timeLeft, setTimeLeft] = React.useState<string>("");
-  const [useCashback, setUseCashback] = React.useState<boolean>(false);
+  const [useCashback, _setUseCashback] = React.useState<boolean>(false);
 
   const cashback = useCashback ? paymentVM.cashback : 0;
   const balance = paymentVM.ethBalance;
@@ -182,29 +180,22 @@ const PaymentImpl: React.FC = observer(() => {
 
   if (!strategiesStore.initialized) return <Loading />;
 
-  const volatilityColor =
-    strategy?.estimatedVolatility === "Low"
-      ? "#ED5959" // red
-      : strategy?.estimatedVolatility === "Medium"
-      ? "#FF8D44" // yellow
-      : strategy?.estimatedVolatility === "High"
-      ? "#70EC9E" // green
-      : undefined;
-
   return (
     <PageContainer>
-      <Row justifyContent="space-between" alignItems="center">
-        <PageTitle>{strategy?.title}</PageTitle>
+      {/* <Row justifyContent="flex-end" alignItems="center">
         <ConnectButton
           showBalance={true}
           accountStatus="avatar"
           chainStatus="icon"
         />
-      </Row>
+      </Row> */}
+      <PageTitle>
+        ETH breaks the range at{" "}
+        {dayjs(strategy?.expiration).format("D MMM, HH:mm")}?
+      </PageTitle>
       <SubTitle>
-        Given {strategy?.estimatedVolatility?.toLocaleLowerCase()} volatility,
-        will {strategy?.symbol} rise or fall by{" "}
-        {dayjs("2025-07-19").format("DD.MM.YYYY")}?
+        {dayjs(strategy?.depositUntil).format("D MMM, HH:mm")} —{" "}
+        {dayjs(strategy?.expiration).format("D MMM, HH:mm")}
       </SubTitle>
       <Section>
         <SectionTitle>Buy tickets</SectionTitle>
@@ -225,10 +216,6 @@ const PaymentImpl: React.FC = observer(() => {
         <SizedBox height={16} />
         <AmountText> {price} ETH</AmountText>
         <SizedBox height={16} />
-        <SecondaryText color={volatilityColor} align="center">
-          Estimated volatility: {strategy?.estimatedVolatility}
-        </SecondaryText>
-        <SizedBox height={16} />
         <Row alignItems="center" justifyContent="center">
           <img src={walletIcon} alt="icon" width={12} />
           &nbsp;
@@ -236,12 +223,12 @@ const PaymentImpl: React.FC = observer(() => {
             Balance: {new BN(balance).toSignificant(4).toFormat()} ETH
           </SecondaryText>
         </Row>
-        <SizedBox height={24} />
+        {/* <SizedBox height={24} />
         <Row alignItems="center" justifyContent="space-between">
           <PrimaryText>Use cashback</PrimaryText>
           <Switch checked={useCashback} onChange={setUseCashback} />
         </Row>
-        <SecondaryText>{paymentVM.cashback} ETH avalible</SecondaryText>
+        <SecondaryText>{paymentVM.cashback} ETH avalible</SecondaryText> */}
         <SizedBox height={24} />
         {paymentVM.error && (
           <>
@@ -251,8 +238,19 @@ const PaymentImpl: React.FC = observer(() => {
             <SizedBox height={16} />
           </>
         )}
+        {paymentVM.isComplianceError && (
+          <>
+            <SecondaryText align="center" style={{ color: "#ff6b6b" }}>
+              {paymentVM.isComplianceError}
+            </SecondaryText>
+            <SizedBox height={16} />
+          </>
+        )}
         {accountStore.isConnected ? (
-          <Button onClick={handleBuyTickets} disabled={paymentVM.isLoading}>
+          <Button
+            onClick={handleBuyTickets}
+            disabled={paymentVM.isLoading || !accountStore.isCompliance}
+          >
             {paymentVM.isLoading
               ? "Processing..."
               : `Buy ${paymentVM.ticketAmount} tickets`}{" "}
@@ -263,16 +261,16 @@ const PaymentImpl: React.FC = observer(() => {
           <Button onClick={modal?.openConnectModal}>Connect wallet</Button>
         )}
         <SizedBox height={16} />
-        <SecondaryText align="center">
-          The offer will renew in {timeLeft}
-        </SecondaryText>
-        <SizedBox height={16} />
         <PrimaryText
           style={{ cursor: "pointer", padding: "8px", textAlign: "center" }}
           onClick={() => navigate("/trades")}
         >
           Cancel
         </PrimaryText>
+        <SizedBox height={16} />
+        <SecondaryText align="center">
+          The offer will renew in {timeLeft}
+        </SecondaryText>
       </Section>
     </PageContainer>
   );

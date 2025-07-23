@@ -262,10 +262,7 @@ export const StrategyCard: React.FC<StrategyCardProps> = ({
         )}
       </Column>
       {strategy.status === "Open" && (
-        <Button
-          onClick={() => navigate(`/strategy/${strategy.id}`)}
-          style={{ marginTop: 24 }}
-        >
+        <Button onClick={() => navigate(`/payment`)} style={{ marginTop: 24 }}>
           Join +{" "}
         </Button>
       )}

@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "@emotion/styled";
 import { keyframes } from "@emotion/react";
-import loadingIcon from "../assets/icons/loading.svg";
+import loadingIcon from "../assets/icons/logo.svg";
 
 const pulse = keyframes`
   0% {

@@ -37,6 +37,9 @@ class AccountStore {
   tradingStats?: TradingStatsResponse;
   isLoading: boolean = false;
 
+  // Compliance state
+  isCompliance: boolean = false;
+
   constructor(rootStore: RootStore, initState?: IAccountStoreInitState) {
     this.rootStore = rootStore;
     makeAutoObservable(this);
@@ -68,6 +71,9 @@ class AccountStore {
     //   url: extractReferralFromURL(),
     //   referrer: this.referrer,
     // });
+    apiService.getComplianceTrace().then((res) => {
+      this.isCompliance = res.access;
+    });
   }
 
   setAddress = (address?: `0x${string}`) => (this.address = address);
@@ -81,10 +87,9 @@ class AccountStore {
   // Метод для вызова аутентификации из компонента с wagmi хуком
   triggerAuthentication = (walletClient?: any) => {
     if (this.isConnected && this.address && !this.isAuthenticating) {
-      console.log("Starting authentication with wallet client");
       this.authenticateUser(walletClient);
     } else {
-      console.log("Authentication conditions not met");
+      console.error("Authentication conditions not met");
     }
   };
 
@@ -127,7 +132,7 @@ class AccountStore {
     const { address, chainId, wagmiConfig } = this.rootStore.accountStore;
 
     if (!address || this.isAuthenticating || !wagmiConfig || !chainId) {
-      console.log("Authentication conditions not met in authenticateUser");
+      console.error("Authentication conditions not met in authenticateUser");
       return;
     }
 

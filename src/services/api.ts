@@ -36,6 +36,7 @@ interface BaseStrategy {
   participants: number;
   estimatedVolatility: "High" | "Medium" | "Low";
   createdAt: string;
+  userDeposit?: number; // User's deposit amount in the strategy
 }
 
 // Open strategy - available for participation
@@ -46,22 +47,22 @@ export interface OpenStrategy extends BaseStrategy {
 // Active strategy - currently running
 export interface ActiveStrategy extends BaseStrategy {
   status: "Active";
-  priceAtOpen: string;
-  breakoutRange: {
-    min: string;
-    max: string;
+  breakoutRange?: {
+    min: number;
+    max: number;
   };
 }
 
 // Expired strategy - completed
 export interface ExpiredStrategy extends BaseStrategy {
   status: "Expired";
-  priceAtOpen: string;
-  priceAtClose: string;
-  income: string;
-  breakoutRange: {
-    min: string;
-    max: string;
+  income?: number;
+  userIncome?: number;
+  priceAtClose?: number;
+
+  breakoutRange?: {
+    min: number;
+    max: number;
   };
 }
 
@@ -160,6 +161,11 @@ class ApiService {
 
   async getStrategies(): Promise<StrategiesResponse> {
     return this.request<StrategiesResponse>("/trading/strategies");
+  }
+
+  // Compliance methods
+  async getComplianceTrace(): Promise<{ access: boolean }> {
+    return this.request<{ access: boolean }>("/compliance/trace");
   }
 }
 

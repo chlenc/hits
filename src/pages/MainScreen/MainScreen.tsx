@@ -1,10 +1,10 @@
 import styled from "@emotion/styled";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import BigNumber from "bignumber.js";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
-import starsIcon from "../../assets/icons/stars.svg";
-import plusIcon from "../../assets/icons/plus.svg";
 import arrowIcon from "../../assets/icons/arrow.svg";
+import plusIcon from "../../assets/icons/plus.svg";
+import starsIcon from "../../assets/icons/stars.svg";
 import Button from "../../components/Button";
 import { Column, Row } from "../../components/Flex";
 import PageContainer from "../../components/PageContainer";
@@ -14,7 +14,6 @@ import { TICKET_PRICE } from "../../configs/networkConfig";
 import { useWalletConnectRedirect } from "../../hooks/useWalletConnectRedirect";
 import { useStores } from "../../stores/useStores";
 import BN from "../../utils/BN";
-import BigNumber from "bignumber.js";
 import Referrals from "./Referrals";
 
 const StyledPageContainer = styled(PageContainer)`
@@ -46,6 +45,8 @@ const MainScreen: React.FC = observer(() => {
   });
   const navigate = useNavigate();
 
+  // const pnlChart = accountStore.tradingStats?.pnl_30d_chart;
+
   //todo
   const claimableBalance = new BN(0);
   // const claimableBalance = BN.formatUnits(stats?.claimableBalance ?? "0", 18);
@@ -65,14 +66,14 @@ const MainScreen: React.FC = observer(() => {
 
   return (
     <StyledPageContainer>
-      <Row justifyContent="space-between" alignItems="center">
+      {/* <Row justifyContent="space-between" alignItems="center">
         <PageTitle>Main</PageTitle>
         <ConnectButton
           showBalance={true}
           accountStatus="avatar"
           chainStatus="icon"
         />
-      </Row>
+      </Row> */}
       <Column crossAxisSize="max">
         <BlockTitle>You have</BlockTitle>
         <Row alignItems="flex-end">
@@ -83,7 +84,7 @@ const MainScreen: React.FC = observer(() => {
         </Row>
         <SizedBox height={16} />
         {ticketsBalance.gt(0) ? (
-          <Button>
+          <Button onClick={() => navigate("/strategies")}>
             Go trade &nbsp; <img src={starsIcon} alt="stars" />
           </Button>
         ) : (
@@ -141,7 +142,7 @@ const MainScreen: React.FC = observer(() => {
             </SecondaryTitle>
           </Row>
         </Row> */}
-        {/* {pnlChart.length > 0 && (
+        {/* {pnlChart && pnlChart.length > 0 && (
           <Section style={{ marginTop: 16 }}>
             <PnLChart data={pnlChart} />
             <Row justifyContent="center">

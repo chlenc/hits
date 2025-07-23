@@ -38,7 +38,6 @@ const WalletAuth: React.FC = observer(() => {
       !accountStore.isAuthenticating &&
       !hasTriggeredAuth.current
     ) {
-      console.log("WalletAuth: triggering authentication");
       hasTriggeredAuth.current = true;
       accountStore.triggerAuthentication(walletClient);
     }

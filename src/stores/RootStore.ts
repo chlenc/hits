@@ -17,6 +17,7 @@ export default class RootStore {
     this.accountStore = new AccountStore(this, initialState?.accountStore);
     this.balanceStore = new BalanceStore(this);
     this.strategiesStore = new StrategiesStore(this);
+
     makeAutoObservable(this);
 
     autorun(
