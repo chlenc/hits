@@ -105,9 +105,8 @@ const PaymentImpl: React.FC = observer(() => {
   const cashback = useCashback ? paymentVM.cashback : 0;
   const balance = paymentVM.ethBalance;
   const price = new BN(paymentVM.ticketAmount * TICKET_PRICE - cashback)
-    .toSignificant(4)
+    .toSignificant(5)
     .toFormat();
-
   const { startsIn } = useCountdown({ depositUntil: strategy?.depositUntil });
 
   if (strategiesStore.initialized && !strategy) {
@@ -181,10 +180,7 @@ const PaymentImpl: React.FC = observer(() => {
           chainStatus="icon"
         />
       </Row> */}
-      <PageTitle>
-        ETH breaks the range at{" "}
-        {dayjs(strategy?.expiration).format("D MMM, HH:mm")}?
-      </PageTitle>
+      <PageTitle>ETH breaks the range?</PageTitle>
       <SubTitle>
         {dayjs(strategy?.depositUntil).format("D MMM, HH:mm")} —{" "}
         {dayjs(strategy?.expiration).format("D MMM, HH:mm")}
@@ -200,7 +196,7 @@ const PaymentImpl: React.FC = observer(() => {
           <StyledButton secondary onClick={paymentVM.decrementTicketAmount}>
             <img src={minusIcon} alt="minus" />
           </StyledButton>
-          <img src={tickerPicture} alt="ticket" style={{ maxWidth: "200px" }} />
+          <img src={tickerPicture} alt="ticket" style={{ maxWidth: "186px" }} />
           <StyledButton secondary onClick={paymentVM.incrementTicketAmount}>
             <img src={plusIcon} alt="plus" />
           </StyledButton>

@@ -1,6 +1,6 @@
 export const NETWORKS = {
   BASE: "base",
-  SEPOLIA: "sepolia",
+  // SEPOLIA: "sepolia",
   // ETHEREUM = "ethereum",
   // POLYGON = "polygon",
   // BSC = "bsc",
@@ -37,36 +37,36 @@ type NetworkConfig = {
 
 //price feeds https://www.pyth.network/developers/price-feed-ids
 export const NetworkConfig: Record<string, NetworkConfig> = {
-  sepolia: {
-    name: NETWORKS.SEPOLIA,
-    chainId: 11155111,
-    contract: "0x35dC6f1415CBF0221F6babf19e2844A86cF5cDc0",
-    rpc: "https://ethereum-sepolia.publicnode.com",
-    explorer: "https://sepolia.etherscan.io",
-    tokens: [
-      {
-        symbol: COINS.ETH,
-        decimals: 18,
-        isNative: true,
-        priceFeed:
-          "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
-      },
-      {
-        symbol: COINS.USDT,
-        decimals: 6,
-        address: "0x622fd0b24B14Fb76d27d8616a96ECbd05fC27527",
-        priceFeed:
-          "0x2b89b9dc8fdf9f34709a5b106b472f0f39bb6ca9ce04b0fd7f2e971688e2e53b",
-      },
-      {
-        symbol: COINS.USDC,
-        decimals: 6,
-        address: "0xd6F4D4e0550622C8165106F81aaCeB0084ac78Ad",
-        priceFeed:
-          "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
-      },
-    ],
-  },
+  // sepolia: {
+  //   name: NETWORKS.SEPOLIA,
+  //   chainId: 11155111,
+  //   contract: "0x35dC6f1415CBF0221F6babf19e2844A86cF5cDc0",
+  //   rpc: "https://ethereum-sepolia.publicnode.com",
+  //   explorer: "https://sepolia.etherscan.io",
+  //   tokens: [
+  //     {
+  //       symbol: COINS.ETH,
+  //       decimals: 18,
+  //       isNative: true,
+  //       priceFeed:
+  //         "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
+  //     },
+  //     {
+  //       symbol: COINS.USDT,
+  //       decimals: 6,
+  //       address: "0x622fd0b24B14Fb76d27d8616a96ECbd05fC27527",
+  //       priceFeed:
+  //         "0x2b89b9dc8fdf9f34709a5b106b472f0f39bb6ca9ce04b0fd7f2e971688e2e53b",
+  //     },
+  //     {
+  //       symbol: COINS.USDC,
+  //       decimals: 6,
+  //       address: "0xd6F4D4e0550622C8165106F81aaCeB0084ac78Ad",
+  //       priceFeed:
+  //         "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+  //     },
+  //   ],
+  // },
   base: {
     name: NETWORKS.BASE,
     chainId: 8453,

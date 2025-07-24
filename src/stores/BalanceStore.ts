@@ -45,7 +45,6 @@ class BalanceStore {
     if (!networkConfig || !address) return;
     const { chainId, tokens: tokensFromConfig, rpc, contract } = networkConfig;
     const nativeTokens = tokensFromConfig.filter((token) => token.isNative);
-
     const client = createPublicClient({
       chain: {
         id: chainId,
