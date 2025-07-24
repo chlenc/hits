@@ -223,6 +223,10 @@ const PaymentImpl: React.FC = observer(() => {
             Balance: {new BN(balance).toSignificant(4).toFormat()} ETH
           </SecondaryText>
         </Row>
+        <SizedBox height={16} />
+        <SecondaryText color="#ED5959" align="center">
+        This app is in beta testing. Use at your own risk.
+        </SecondaryText>
         {/* <SizedBox height={24} />
         <Row alignItems="center" justifyContent="space-between">
           <PrimaryText>Use cashback</PrimaryText>

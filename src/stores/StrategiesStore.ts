@@ -14,7 +14,12 @@ class StrategiesStore {
   }
 
   async fetchStrategies() {
-    const response = await apiService.getStrategies();
+    const accountStore = this.rootStore.accountStore;
+    const { address, signatures } = accountStore;
+    const response = await apiService.getStrategies(
+      address != null && signatures[address] != null ? signatures[address] : undefined,
+      address
+    );
     runInAction(() => {
       this.strategies = response.strategies;
       this._initialized = true;

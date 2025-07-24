@@ -146,9 +146,12 @@ export const CurrentStrategy: React.FC<StrategyCardProps> = ({
   const userDeposit = BN.formatUnits(strategy?.userDeposit ?? 0, 18);
   const userTickets = userDeposit.div(TICKET_PRICE);
 
-  const userIncome = BN.formatUnits(strategy?.userIncome ?? 0, 18);
-  const userIncomePct = userIncome.div(userDeposit).times(100);
-
+  let userIncome = BN.ZERO;
+  let userIncomePct = BN.ZERO;
+  if (strategy.status === "Expired") {
+    userIncome = BN.formatUnits(strategy?.userIncome ?? 0, 18);
+    userIncomePct = userIncome.div(userDeposit).times(100);
+  }
 
   React.useEffect(() => {
     if (strategy.depositUntil) {
@@ -161,7 +164,6 @@ export const CurrentStrategy: React.FC<StrategyCardProps> = ({
       return () => clearInterval(interval);
     }
   }, [strategy.depositUntil, strategy.expiration]);
-
 
   let isProfit = true;
   if (strategy.status === "Expired") isProfit = pnl.gte(0);

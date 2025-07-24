@@ -2,7 +2,6 @@ import styled from "@emotion/styled";
 import BigNumber from "bignumber.js";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
-import arrowIcon from "../../assets/icons/arrow.svg";
 import plusIcon from "../../assets/icons/plus.svg";
 import starsIcon from "../../assets/icons/stars.svg";
 import Button from "../../components/Button";
@@ -15,10 +14,6 @@ import { useWalletConnectRedirect } from "../../hooks/useWalletConnectRedirect";
 import { useStores } from "../../stores/useStores";
 import BN from "../../utils/BN";
 import Referrals from "./Referrals";
-
-const StyledPageContainer = styled(PageContainer)`
-  gap: 32px;
-`;
 
 const BlockTitle = styled.div`
   color: #fff;
@@ -37,14 +32,20 @@ const SecondaryTitle = styled.div<{ color?: string }>`
   font-weight: 400;
 `;
 
+const Divider = styled.div`
+  width: 100%;
+  height: 1px;
+  background-color: #2b2a2a;
+`;
+
 const MainScreen: React.FC = observer(() => {
-  const { balanceStore } = useStores();
+  const { balanceStore, accountStore } = useStores();
   useWalletConnectRedirect({
     redirectPath: "/strategies",
     autoOpenModal: true,
   });
   const navigate = useNavigate();
-
+  const stats = accountStore.tradingStats;
   // const pnlChart = accountStore.tradingStats?.pnl_30d_chart;
 
   //todo
@@ -59,13 +60,11 @@ const MainScreen: React.FC = observer(() => {
     .div(TICKET_PRICE)
     .toDecimalPlaces(0, BigNumber.ROUND_DOWN);
 
-  //todo
-  const totalPnL = new BN(0);
-  // const totalPnL = new BN(stats?.totalPnL ?? "0");
+  const totalPnL = new BN(stats?.totalPnL ?? "0");
   const totalPnLUSD = totalPnL.times(balanceStore.prices.ETH ?? 0);
 
   return (
-    <StyledPageContainer>
+    <PageContainer style={{ gap: "32px" }}>
       {/* <Row justifyContent="space-between" alignItems="center">
         <PageTitle>Main</PageTitle>
         <ConnectButton
@@ -75,23 +74,17 @@ const MainScreen: React.FC = observer(() => {
         />
       </Row> */}
       <Column crossAxisSize="max">
-        <BlockTitle>You have</BlockTitle>
+        <BlockTitle>For next strategy you have</BlockTitle>
         <Row alignItems="flex-end">
           <PageTitle>
             {ticketsBalance.toFormat()}{" "}
-            {ticketsBalance.eq(1) ? "Ticket" : "Tickets"}{" "}
+            {ticketsBalance.eq(1) ? "Ticket" : "Tickets"}
           </PageTitle>
         </Row>
         <SizedBox height={16} />
-        {ticketsBalance.gt(0) ? (
-          <Button onClick={() => navigate("/strategies")}>
-            Go trade &nbsp; <img src={starsIcon} alt="stars" />
-          </Button>
-        ) : (
-          <Button>
-            Buy Tickets &nbsp; <img src={plusIcon} alt="plusIcon" />
-          </Button>
-        )}
+        <Button onClick={() => navigate("/payment")}>
+          Buy more tickets &nbsp; <img src={plusIcon} alt="plusIcon" />
+        </Button>
       </Column>
       {claimableBalance.gt(0) && (
         <Column crossAxisSize="max">
@@ -117,7 +110,7 @@ const MainScreen: React.FC = observer(() => {
         style={{ width: "100%" }}
       /> */}
       <Column crossAxisSize="max">
-        <BlockTitle>Total PnL</BlockTitle>
+        <BlockTitle>Total PnL (⚠️ mocked data)</BlockTitle>
         <Row alignItems="flex-end">
           <PageTitle>{totalPnL.toSignificant(4).toFormat()} ETH</PageTitle>
           <SizedBox width={8} />
@@ -126,6 +119,18 @@ const MainScreen: React.FC = observer(() => {
             {totalPnLUSD.abs().toSignificant(2).toFormat()}
           </SecondaryTitle>
         </Row>
+        {stats && stats.userStrategies && stats.userStrategies.length > 0 && (
+          <>
+            <SizedBox height={32} />
+            <Divider />
+            <PageTitle style={{ margin: "16px 0" }}>Trades History</PageTitle>
+            <Divider />
+            {stats?.userStrategies.map((strategy) => (
+              <SecondaryTitle>{strategy.title} </SecondaryTitle>
+            ))}
+          </>
+        )}
+
         {/* <SizedBox height={16} /> */}
         {/* <BlockTitle>Trades</BlockTitle>
         <Row alignItems="flex-end">
@@ -150,18 +155,11 @@ const MainScreen: React.FC = observer(() => {
             </Row>
           </Section>
         )} */}
-        <Button
-          style={{ marginTop: 16 }}
-          onClick={() => navigate("/trades")}
-          secondary
-        >
-          Trades History &nbsp; <img src={arrowIcon} alt="arrow" />
-        </Button>
       </Column>
-      <PageTitle>Referral program</PageTitle>
+      <PageTitle>Referrals</PageTitle>
       <Referrals />
       <SizedBox height={32} />
-    </StyledPageContainer>
+    </PageContainer>
   );
 });
 

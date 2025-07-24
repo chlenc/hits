@@ -16,9 +16,9 @@ const PageContainerRoot = styled.div`
   box-sizing: border-box;
 `;
 
-const PageContainer = ({ children }: { children: React.ReactNode }) => {
+const PageContainer = ({ children, style }: { children: React.ReactNode, style?: React.CSSProperties }) => {
   return (
-    <PageContainerRoot>
+    <PageContainerRoot style={style}>
       <Row justifyContent="space-between" alignItems="center">
         <img src={logoIcon} alt="logo" height={32} />
         <ConnectButton

@@ -159,8 +159,14 @@ class ApiService {
     return this.request<TradingStatsResponse>("/trading/stats", { headers });
   }
 
-  async getStrategies(): Promise<StrategiesResponse> {
-    return this.request<StrategiesResponse>("/trading/strategies");
+  async getStrategies(
+    signature?: string,
+    address?: string
+  ): Promise<StrategiesResponse> {
+    const headers: Record<string, string> = {};
+    signature != null && (headers.Authorization = `Bearer ${signature}`);
+    address != null && (headers["x-address"] = address);
+    return this.request<StrategiesResponse>("/trading/strategies", { headers });
   }
 
   // Compliance methods
