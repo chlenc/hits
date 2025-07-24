@@ -7,13 +7,14 @@ import plusIcon from "../assets/icons/plus.svg";
 import starsIcon from "../assets/icons/stars.svg";
 import type { Strategy } from "../services/api";
 import BN from "../utils/BN";
-import updateCountdown from "../utils/updateCountdown";
 import Button from "./Button";
 import { Column, Row } from "./Flex";
 import PriceChart from "./PriceChart";
 import SizedBox from "./SizedBox";
 import { TICKET_PRICE } from "../configs/networkConfig";
 import BigNumber from "bignumber.js";
+import useCountdown from "../hooks/useCountdown";
+import { BasicBadge, ProfitBadge, StatusBadge } from "./Badge";
 
 // Типы пропсов
 export type StrategyCardProps = {
@@ -53,47 +54,6 @@ const Title = styled.div`
   letter-spacing: -0.34px;
 `;
 
-const BasicBadge = styled.span`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-family: "Instrument Sans";
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 100%;
-  letter-spacing: -0.12px;
-
-  height: 24px;
-  padding: 0 8px;
-
-  border-radius: 16px;
-  box-sizing: border-box;
-  z-index: 1;
-  background: #2b2a2a;
-  color: #d9d9d9;
-`;
-
-const Status = styled(BasicBadge)<{ status: "Active" | "Open" | "Expired" }>`
-  background: ${({ status }) =>
-    status === "Active"
-      ? "#70EC9E"
-      : status === "Expired"
-      ? "#4E4C51"
-      : "#8F4AF5"};
-  color: ${({ status }) => (status === "Active" ? "#000" : "#fff")};
-  border: 1px solid
-    ${({ status }) => (status === "Active" ? "#70EC9E" : "#222024")};
-`;
-
-const ProfitBadge = styled(BasicBadge)<{ status: "profit" | "loss" }>`
-  background: transparent;
-  color: ${({ status }) => (status === "profit" ? "#70EC9E" : "#ED5959")};
-  border: 1px solid
-    ${({ status }) => (status === "profit" ? "#70EC9E" : "#ED5959")};
-`;
-
 const Text = styled.div`
   font-family: "Instrument Sans";
   font-size: 12px;
@@ -110,34 +70,13 @@ const ValueTitle = styled.div<{ color?: string }>`
   line-height: 120%; /* 19.2px */
 `;
 
-// const ChangePercentText = styled(ValueTitle)<{ isNegative?: boolean }>`
-//   font-size: 24px;
-//   line-height: 140%;
-//   letter-spacing: -0.48px;
-//   color: ${({ isNegative }) => (isNegative ? "#9A45FE" : "#19F096")};
-// `;
-
-// const StyledButton = styled(Button)`
-//   position: absolute;
-//   right: 16px;
-//   bottom: 16px;
-//   max-width: 110px;
-//   z-index: 1;
-// `;
-
 export const StrategyCard: React.FC<StrategyCardProps> = ({
   strategy,
   onClaim,
 }) => {
   const navigate = useNavigate();
-
-  // Countdown to depositUntil
-  const [startsIn, setStartsIn] = React.useState<string>("");
-  const [activeUntil, setActiveUntil] = React.useState<string>("");
-
-  // strategy.income = 0.054321; //fixme
-  // strategy.userDeposit = 0.05 * 10 ** 18; //fixme
-  // strategy.userIncome = 0.08 * 10 ** 18; //fixme
+  const { depositUntil, expiration } = strategy;
+  const { startsIn, activeUntil } = useCountdown({ depositUntil, expiration });
 
   const pnl =
     strategy.status === "Expired"
@@ -156,18 +95,6 @@ export const StrategyCard: React.FC<StrategyCardProps> = ({
     userIncomePct = userIncome.div(userDeposit).times(100);
   }
 
-  React.useEffect(() => {
-    if (strategy.depositUntil) {
-      updateCountdown(strategy.depositUntil, setStartsIn);
-      updateCountdown(strategy.expiration, setActiveUntil);
-      const interval = setInterval(() => {
-        updateCountdown(strategy.depositUntil, setStartsIn);
-        updateCountdown(strategy.expiration, setActiveUntil);
-      }, 1000 * 60);
-      return () => clearInterval(interval);
-    }
-  }, [strategy.depositUntil, strategy.expiration]);
-
   let isProfit = true;
   if (strategy.status === "Expired") isProfit = pnl.gte(0);
 
@@ -183,8 +110,8 @@ export const StrategyCard: React.FC<StrategyCardProps> = ({
           </BasicBadge>
         ) : (
           <BasicBadge>
-            {dayjs(strategy.depositUntil).format("D MMM, HH:mm")} —{" "}
-            {dayjs(strategy.expiration).format("D MMM, HH:mm")}
+            {dayjs(depositUntil).format("D MMM, HH:mm")} —{" "}
+            {dayjs(expiration).format("D MMM, HH:mm")}
           </BasicBadge>
         )}
         <SizedBox width={8} />
@@ -195,15 +122,14 @@ export const StrategyCard: React.FC<StrategyCardProps> = ({
             <ProfitBadge status="loss">Loss</ProfitBadge>
           )
         ) : (
-          <Status status={strategy.status}>{strategy.status}</Status>
+          <StatusBadge status={strategy.status}>{strategy.status}</StatusBadge>
         )}
       </Row>
       <SizedBox height={16} />
       <Title>{strategy.symbol} breaks the range?</Title>
-      <SizedBox height={16} />
       {strategy.status === "Active" && (
         <>
-          <Row justifyContent="space-between" alignItems="center">
+          <Row style={{ marginTop: 16 }} justifyContent="space-between">
             <Column>
               <ValueTitle>
                 ${strategy.breakoutRange?.min}-{strategy.breakoutRange?.max}
@@ -219,7 +145,7 @@ export const StrategyCard: React.FC<StrategyCardProps> = ({
       )}
       {strategy.status === "Expired" && (
         <>
-          <Row justifyContent="space-between" alignItems="center">
+          <Row style={{ marginTop: 16 }} justifyContent="space-between">
             <Column>
               <ValueTitle>
                 ${strategy.breakoutRange?.min}-{strategy.breakoutRange?.max}
@@ -250,9 +176,10 @@ export const StrategyCard: React.FC<StrategyCardProps> = ({
         </>
       )}
 
-      {strategy.status === "Open" && ticketsBalance.gt(0) && (
-        <ValueTitle>
-          You’re in with {ticketsBalance.toFormat()} tickets
+      {["Open", "Active"].includes(strategy.status) && ticketsBalance.gt(0) && (
+        <ValueTitle style={{ marginTop: 16 }}>
+          You’re in with {ticketsBalance.toFormat()}{" "}
+          {ticketsBalance.eq(1) ? "ticket" : "tickets"}
         </ValueTitle>
       )}
 
@@ -263,8 +190,8 @@ export const StrategyCard: React.FC<StrategyCardProps> = ({
             lineColor={isProfit ? "#70EC9E" : "#ED5959"}
             upper={strategy.breakoutRange?.max}
             lower={strategy.breakoutRange?.min}
-            to={dayjs(strategy.expiration).unix() * 1000}
-            from={dayjs(strategy.depositUntil).unix() * 1000}
+            to={dayjs(expiration).unix() * 1000}
+            from={dayjs(depositUntil).unix() * 1000}
           />
         </>
       )}

@@ -19,8 +19,8 @@ import SizedBox from "../../components/SizedBox";
 import { TICKET_PRICE } from "../../configs/networkConfig";
 import { useStores } from "../../stores/useStores";
 import BN from "../../utils/BN";
-import updateCountdown from "../../utils/updateCountdown";
 import { PaymentScreenVMProvider, usePaymentScreenVM } from "./PaymentScreenVM";
+import useCountdown from "../../hooks/useCountdown";
 
 const SectionTitle = styled.h5`
   font-family: "Instrument Sans";
@@ -98,7 +98,6 @@ const PaymentImpl: React.FC = observer(() => {
 
   const strategy = paymentVM.openStrategy;
 
-  const [timeLeft, setTimeLeft] = React.useState<string>("");
   const [useCashback, _setUseCashback] = React.useState<boolean>(false);
 
   const cashback = useCashback ? paymentVM.cashback : 0;
@@ -107,21 +106,12 @@ const PaymentImpl: React.FC = observer(() => {
     .toSignificant(4)
     .toFormat();
 
+  const { startsIn } = useCountdown({ depositUntil: strategy?.depositUntil });
+
   if (strategiesStore.initialized && !strategy) {
     navigate("/strategies");
     return;
   }
-
-  React.useEffect(() => {
-    if (strategy?.depositUntil) {
-      updateCountdown(strategy.depositUntil, setTimeLeft);
-      const interval = setInterval(
-        () => updateCountdown(strategy?.depositUntil, setTimeLeft),
-        1000 * 60
-      );
-      return () => clearInterval(interval);
-    }
-  }, [strategy?.depositUntil]);
 
   const handleBuyTickets = async () => {
     paymentVM.setError(null);
@@ -225,7 +215,7 @@ const PaymentImpl: React.FC = observer(() => {
         </Row>
         <SizedBox height={16} />
         <SecondaryText color="#ED5959" align="center">
-        This app is in beta testing. Use at your own risk.
+          This app is in beta testing. Use at your own risk.
         </SecondaryText>
         {/* <SizedBox height={24} />
         <Row alignItems="center" justifyContent="space-between">
@@ -273,7 +263,7 @@ const PaymentImpl: React.FC = observer(() => {
         </PrimaryText>
         <SizedBox height={16} />
         <SecondaryText align="center">
-          The offer will renew in {timeLeft}
+          The offer will renew in {startsIn}
         </SecondaryText>
       </Section>
     </PageContainer>

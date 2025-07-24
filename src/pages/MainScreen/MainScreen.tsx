@@ -39,7 +39,7 @@ const MainScreen: React.FC = observer(() => {
     redirectPath: "/strategies",
     autoOpenModal: true,
   });
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const stats = accountStore.tradingStats;
   // const pnlChart = accountStore.tradingStats?.pnl_30d_chart;
 
@@ -50,38 +50,16 @@ const MainScreen: React.FC = observer(() => {
     balanceStore.prices.ETH ?? 0
   );
 
-  const deposited = BN.formatUnits(balanceStore.balances.TICKET?.balance ?? 0);
-  const ticketsBalance = deposited
-    .div(TICKET_PRICE)
-    .toDecimalPlaces(0, BigNumber.ROUND_DOWN);
+  // const deposited = BN.formatUnits(balanceStore.balances.TICKET?.balance ?? 0);
+  // const ticketsBalance = deposited
+  //   .div(TICKET_PRICE)
+  //   .toDecimalPlaces(0, BigNumber.ROUND_DOWN);
 
   const totalPnL = new BN(stats?.totalPnL ?? "0");
   const totalPnLUSD = totalPnL.times(balanceStore.prices.ETH ?? 0);
 
   return (
     <PageContainer style={{ gap: "32px" }}>
-      {/* <Row justifyContent="space-between" alignItems="center">
-        <PageTitle>Main</PageTitle>
-        <ConnectButton
-          showBalance={true}
-          accountStatus="avatar"
-          chainStatus="icon"
-        />
-      </Row> */}
-      <Column crossAxisSize="max">
-        <BlockTitle>For next strategy you have</BlockTitle>
-        <Row alignItems="flex-end">
-          <PageTitle>
-            {ticketsBalance.toFormat()}{" "}
-            {ticketsBalance.eq(1) ? "Ticket" : "Tickets"}
-          </PageTitle>
-        </Row>
-        <SizedBox height={16} />
-        <Button onClick={() => navigate("/payment")}>
-          {ticketsBalance.gt(0) ? "Increase position" : "Join"} &nbsp;{" "}
-          <img src={plusIcon} alt="plusIcon" />
-        </Button>
-      </Column>
       {claimableBalance.gt(0) && (
         <Column crossAxisSize="max">
           <BlockTitle>Claimable Balance</BlockTitle>
