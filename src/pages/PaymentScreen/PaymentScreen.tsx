@@ -8,7 +8,9 @@ import { useConfig, useSendTransaction } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import arrowIcon from "../../assets/icons/arrow.svg";
 import walletIcon from "../../assets/icons/wallet.svg";
-import tickerPicture from "../../assets/images/ticketPreview.svg";
+import minusIcon from "../../assets/icons/minus.svg";
+import plusIcon from "../../assets/icons/plus.svg";
+import tickerPicture from "../../assets/images/ticketPreview.webp";
 import Button from "../../components/Button";
 import { Row } from "../../components/Flex";
 import Loading from "../../components/Loading";
@@ -196,11 +198,11 @@ const PaymentImpl: React.FC = observer(() => {
           alignItems="center"
         >
           <StyledButton secondary onClick={paymentVM.decrementTicketAmount}>
-            -
+            <img src={minusIcon} alt="minus" />
           </StyledButton>
-          <img src={tickerPicture} alt="ticket" />
+          <img src={tickerPicture} alt="ticket" style={{ maxWidth: "200px" }} />
           <StyledButton secondary onClick={paymentVM.incrementTicketAmount}>
-            +
+            <img src={plusIcon} alt="plus" />
           </StyledButton>
         </Row>
         <SizedBox height={16} />

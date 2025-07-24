@@ -19,10 +19,6 @@ export interface ChartDataPoint {
 export interface TradingStatsResponse {
   claimableBalance: string; // in ETH
   totalPnL: string; // in ETH
-  totalTradesAmount: number;
-  winTradesAmount: number;
-  loseTradesAmount: number;
-  pnl_30d_chart: ChartDataPoint[];
   userStrategies: Strategy[];
 }
 

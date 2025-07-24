@@ -1,15 +1,11 @@
 import styled from "@emotion/styled";
-import BigNumber from "bignumber.js";
 import { observer } from "mobx-react-lite";
-import { useNavigate } from "react-router-dom";
-import plusIcon from "../../assets/icons/plus.svg";
 import starsIcon from "../../assets/icons/stars.svg";
 import Button from "../../components/Button";
 import { Column, Row } from "../../components/Flex";
 import PageContainer from "../../components/PageContainer";
 import PageTitle from "../../components/PageTitle";
 import SizedBox from "../../components/SizedBox";
-import { TICKET_PRICE } from "../../configs/networkConfig";
 import { useWalletConnectRedirect } from "../../hooks/useWalletConnectRedirect";
 import { useStores } from "../../stores/useStores";
 import BN from "../../utils/BN";
@@ -84,7 +80,7 @@ const MainScreen: React.FC = observer(() => {
         style={{ width: "100%" }}
       /> */}
       <Column crossAxisSize="max">
-        <BlockTitle>Total PnL (⚠️ mocked data)</BlockTitle>
+        <BlockTitle>Total PnL</BlockTitle>
         <Row alignItems="flex-end">
           <PageTitle>{totalPnL.toSignificant(4).toFormat()} ETH</PageTitle>
           <SizedBox width={8} />

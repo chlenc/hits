@@ -11,11 +11,9 @@ const useCountdown = (props: {
   useEffect(() => {
     if (depositUntil) updateCountdown(depositUntil, setStartsIn);
     if (expiration) updateCountdown(expiration, setActiveUntil);
-    console.log(activeUntil, expiration);
     const interval = setInterval(() => {
       if (depositUntil) updateCountdown(depositUntil, setStartsIn);
       if (expiration) updateCountdown(expiration, setActiveUntil);
-      console.log(activeUntil, expiration);
     }, 1000 * 60);
     return () => clearInterval(interval);
   }, [depositUntil, expiration]);

@@ -50,18 +50,6 @@ const PriceChart: React.FC<PriceChartProps> = observer(
       return null;
     }
 
-    if (upper == null || lower == null) {
-      // Используем поле close, если есть, иначе value
-      const values = data.map((d) =>
-        typeof d.close === "number" ? d.close : d.value
-      );
-      const max = Math.max(...values);
-      const min = Math.min(...values);
-      const avg = values.reduce((a, b) => a + b, 0) / values.length;
-
-      if (upper == null) upper = (avg + max) / 2;
-      if (lower == null) lower = (avg + min) / 2;
-    }
 
     // Ensure data points have valid date values before rendering the chart.
     const validData = data.every((point) => {
@@ -82,20 +70,23 @@ const PriceChart: React.FC<PriceChartProps> = observer(
     };
 
     const xs = data.map((p) => new Date(p.time));
-    const boundsSeries = [
-      {
-        label: `Upper: ${new BN(upper).toFormat(0)}`,
-        data: xs.map((x) => ({ x, y: upper })),
-        showPoints: false,
-      },
-      {
-        label: `Lower: ${new BN(lower).toFormat(0)}`,
-        data: xs.map((x) => ({ x, y: lower })),
-        showPoints: false,
-      },
-    ];
+    const chartData = [priceSeries];
 
-    const chartData = [priceSeries, ...boundsSeries];
+    if (upper != null && lower != null) {
+      const boundsSeries = [
+        {
+          label: `Upper: ${new BN(upper).toFormat(0)}`,
+          data: xs.map((x) => ({ x, y: upper })),
+          showPoints: false,
+        },
+        {
+          label: `Lower: ${new BN(lower).toFormat(0)}`,
+          data: xs.map((x) => ({ x, y: lower })),
+          showPoints: false,
+        },
+      ];
+      chartData.push(...boundsSeries);
+    }
 
     return (
       <div
