@@ -125,7 +125,7 @@ const ValueTitle = styled.div<{ color?: string }>`
 //   z-index: 1;
 // `;
 
-export const CurrentStrategy: React.FC<StrategyCardProps> = ({
+export const StrategyCard: React.FC<StrategyCardProps> = ({
   strategy,
   onClaim,
 }) => {
@@ -285,4 +285,4 @@ export const CurrentStrategy: React.FC<StrategyCardProps> = ({
   );
 };
 
-export default CurrentStrategy;
+export default StrategyCard;

@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import React from "react";
-import CurrentStrategy from "../components/CurrentStrategy";
+import StrategyCard from "../components/StrategyCard";
 import Loading from "../components/Loading";
 import PageContainer from "../components/PageContainer";
 import PageTitle from "../components/PageTitle";
@@ -17,7 +17,7 @@ const Strategies: React.FC = observer(() => {
         .slice()
         .reverse()
         .map((strategy) => (
-          <CurrentStrategy key={strategy.id} strategy={strategy} />
+          <StrategyCard key={strategy.id} strategy={strategy} />
         ))}
     </PageContainer>
   );
