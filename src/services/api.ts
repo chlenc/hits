@@ -29,13 +29,10 @@ export interface TradingStatsResponse {
 // Base strategy interface with common fields
 interface BaseStrategy {
   id: string;
-  title: string;
   symbol: string;
   expiration: string;
   depositUntil: string;
   participants: number;
-  estimatedVolatility: "High" | "Medium" | "Low";
-  createdAt: string;
   userDeposit?: number; // User's deposit amount in the strategy
 }
 
@@ -59,7 +56,6 @@ export interface ExpiredStrategy extends BaseStrategy {
   income?: number;
   userIncome?: number;
   priceAtClose?: number;
-
   breakoutRange?: {
     min: number;
     max: number;

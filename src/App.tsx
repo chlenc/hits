@@ -6,8 +6,7 @@ import TargetIcon from "./assets/icons/target.svg";
 import BottomNav from "./components/BottomNav";
 import About from "./pages/About";
 import MainScreen from "./pages/MainScreen";
-import Trades from "./pages/Trades";
-import Strategy from "./pages/PaymentScreen";
+import PaymentScreen from "./pages/PaymentScreen";
 import Strategies from "./pages/Strategies";
 
 export const screens = [
@@ -41,8 +40,7 @@ export default function App() {
         <Route path="/main" element={<MainScreen />} />
         <Route path="/strategies" element={<Strategies />} />
         <Route path="/about" element={<About />} />
-        <Route path="/trades" element={<Trades />} />
-        <Route path="/payment" element={<Strategy />} />
+        <Route path="/payment" element={<PaymentScreen />} />
         <Route path="*" element={<Navigate to="/strategies" replace />} />
       </Routes>
       <BottomNav active={active} />

@@ -60,6 +60,7 @@ class AccountStore {
       ([userData, address]) => {
         if (userData && address && !this.isLoading) {
           this.fetchTradingStats();
+          this.rootStore.strategiesStore.fetchStrategies();
         }
       },
       { fireImmediately: true }

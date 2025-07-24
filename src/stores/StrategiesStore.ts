@@ -10,6 +10,7 @@ class StrategiesStore {
   constructor(rootStore: RootStore, _initState?: any) {
     this.rootStore = rootStore;
     makeAutoObservable(this);
+
     this.fetchStrategies();
   }
 
@@ -21,6 +22,7 @@ class StrategiesStore {
       address
     );
     runInAction(() => {
+      console.log({ strategies: response.strategies });
       this.strategies = response.strategies;
       this._initialized = true;
     });

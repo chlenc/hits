@@ -13,6 +13,7 @@ import { Column, Row } from "./Flex";
 import PriceChart from "./PriceChart";
 import SizedBox from "./SizedBox";
 import { TICKET_PRICE } from "../configs/networkConfig";
+import BigNumber from "bignumber.js";
 
 // Типы пропсов
 export type StrategyCardProps = {
@@ -143,8 +144,10 @@ export const CurrentStrategy: React.FC<StrategyCardProps> = ({
       ? new BN(strategy.income ?? 0).times(100)
       : BN.ZERO;
 
-  const userDeposit = BN.formatUnits(strategy?.userDeposit ?? 0, 18);
-  const userTickets = userDeposit.div(TICKET_PRICE);
+  const userDeposit = new BN(strategy?.userDeposit ?? 0);
+  const ticketsBalance = userDeposit
+    .div(TICKET_PRICE)
+    .toDecimalPlaces(0, BigNumber.ROUND_DOWN);
 
   let userIncome = BN.ZERO;
   let userIncomePct = BN.ZERO;
@@ -230,16 +233,16 @@ export const CurrentStrategy: React.FC<StrategyCardProps> = ({
           </Row>
           <Row style={{ marginTop: 16 }} justifyContent="space-between">
             <ValueTitle>
-              {userTickets.eq(0) && "You didn’t play this one"}
-              {userTickets.gt(0) &&
+              {ticketsBalance.eq(0) && "You didn’t play this one"}
+              {ticketsBalance.gt(0) &&
                 userIncome.gt(0) &&
                 `You won ${userIncome.toFormat()} ${strategy.symbol}`}
-              {userTickets.gt(0) &&
+              {ticketsBalance.gt(0) &&
                 userIncome.lte(0) &&
-                `You burned ${userTickets.toFormat()} tickets`}
+                `You burned ${ticketsBalance.toFormat()} tickets`}
             </ValueTitle>
             <ValueTitle color="#70EC9E">
-              {userTickets.gt(0) &&
+              {ticketsBalance.gt(0) &&
                 userIncome.gt(0) &&
                 userIncomePct.toSignificant(2).toFormat()}
             </ValueTitle>
@@ -247,10 +250,10 @@ export const CurrentStrategy: React.FC<StrategyCardProps> = ({
         </>
       )}
 
-      {strategy.status === "Open" && userTickets.gt(0) && (
-        <Row style={{ marginBottom: 16 }}>
-          <ValueTitle>You’re in with 2 tickets</ValueTitle>
-        </Row>
+      {strategy.status === "Open" && ticketsBalance.gt(0) && (
+        <ValueTitle>
+          You’re in with {ticketsBalance.toFormat()} tickets
+        </ValueTitle>
       )}
 
       {strategy.status !== "Open" && (
@@ -267,7 +270,7 @@ export const CurrentStrategy: React.FC<StrategyCardProps> = ({
       )}
       {strategy.status === "Open" && (
         <Button onClick={() => navigate(`/payment`)} style={{ marginTop: 16 }}>
-          Join&nbsp;
+          {ticketsBalance.gt(0) ? "Increase position" : "Join"}&nbsp;
           <img src={plusIcon} alt="plus" />
         </Button>
       )}

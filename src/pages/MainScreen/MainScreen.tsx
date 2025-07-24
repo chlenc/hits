@@ -14,6 +14,7 @@ import { useWalletConnectRedirect } from "../../hooks/useWalletConnectRedirect";
 import { useStores } from "../../stores/useStores";
 import BN from "../../utils/BN";
 import Referrals from "./Referrals";
+import TradesHistory from "./TradesHistory";
 
 const BlockTitle = styled.div`
   color: #fff;
@@ -30,12 +31,6 @@ const SecondaryTitle = styled.div<{ color?: string }>`
   font-size: 24px;
   font-style: normal;
   font-weight: 400;
-`;
-
-const Divider = styled.div`
-  width: 100%;
-  height: 1px;
-  background-color: #2b2a2a;
 `;
 
 const MainScreen: React.FC = observer(() => {
@@ -83,7 +78,8 @@ const MainScreen: React.FC = observer(() => {
         </Row>
         <SizedBox height={16} />
         <Button onClick={() => navigate("/payment")}>
-          Buy more tickets &nbsp; <img src={plusIcon} alt="plusIcon" />
+          {ticketsBalance.gt(0) ? "Increase position" : "Join"} &nbsp;{" "}
+          <img src={plusIcon} alt="plusIcon" />
         </Button>
       </Column>
       {claimableBalance.gt(0) && (
@@ -120,15 +116,7 @@ const MainScreen: React.FC = observer(() => {
           </SecondaryTitle>
         </Row>
         {stats && stats.userStrategies && stats.userStrategies.length > 0 && (
-          <>
-            <SizedBox height={32} />
-            <Divider />
-            <PageTitle style={{ margin: "16px 0" }}>Trades History</PageTitle>
-            <Divider />
-            {stats?.userStrategies.map((strategy) => (
-              <SecondaryTitle>{strategy.title} </SecondaryTitle>
-            ))}
-          </>
+          <TradesHistory strategies={stats.userStrategies} />
         )}
 
         {/* <SizedBox height={16} /> */}

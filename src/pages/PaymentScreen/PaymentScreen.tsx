@@ -1,9 +1,9 @@
 import styled from "@emotion/styled";
-import { ConnectButton, useConnectModal } from "@rainbow-me/rainbowkit";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import dayjs from "dayjs";
 import { observer } from "mobx-react-lite";
 import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useConfig, useSendTransaction } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import arrowIcon from "../../assets/icons/arrow.svg";
