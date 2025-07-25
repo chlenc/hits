@@ -23,6 +23,7 @@ import { useStores } from "../../stores/useStores";
 import BN from "../../utils/BN";
 import { PaymentScreenVMProvider, usePaymentScreenVM } from "./PaymentScreenVM";
 import useCountdown from "../../hooks/useCountdown";
+import { toast } from "react-toastify";
 
 const SectionTitle = styled.h5`
   font-family: "Instrument Sans";
@@ -115,14 +116,12 @@ const PaymentImpl: React.FC = observer(() => {
   }
 
   const handleBuyTickets = async () => {
-    paymentVM.setError(null);
-
     // Check if user has enough balance
     const requiredBalance = paymentVM.ticketAmount * TICKET_PRICE;
     const currentBalance = Number(balance);
 
     if (currentBalance < requiredBalance) {
-      paymentVM.setError("Insufficient balance");
+      toast.error("Insufficient balance");
       return;
     }
 
@@ -152,18 +151,21 @@ const PaymentImpl: React.FC = observer(() => {
 
       if (receipt.status === "success") {
         // Update balances after successful transaction
-        await balanceStore.updateTokenBalances();
+        await Promise.all([
+          balanceStore.updateTokenBalances(),
+          strategiesStore.fetchStrategies(),
+          accountStore.fetchTradingStats(),
+        ]);
       }
 
       // Reset ticket amount after initiating purchase
       paymentVM.setTicketAmount(1);
 
       navigate("/strategies");
+      toast.success("Tickets bought successfully");
     } catch (err) {
       console.error("Error buying tickets:", err);
-      paymentVM.setError(
-        err instanceof Error ? err.message : "Failed to buy tickets"
-      );
+      toast.error(err instanceof Error ? err.message : "Failed to buy tickets");
     } finally {
       paymentVM.setIsLoading(false);
     }
@@ -222,14 +224,6 @@ const PaymentImpl: React.FC = observer(() => {
         </Row>
         <SecondaryText>{paymentVM.cashback} ETH avalible</SecondaryText> */}
         <SizedBox height={24} />
-        {paymentVM.error && (
-          <>
-            <SecondaryText align="center" style={{ color: "#ff6b6b" }}>
-              {paymentVM.error}
-            </SecondaryText>
-            <SizedBox height={16} />
-          </>
-        )}
         {paymentVM.isComplianceError && (
           <>
             <SecondaryText align="center" style={{ color: "#ff6b6b" }}>

@@ -23,7 +23,6 @@ class PaymentScreenVM {
   // State
   ticketAmount: number = 1;
   isLoading: boolean = false;
-  error: string | null = null;
 
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore;
@@ -47,8 +46,6 @@ class PaymentScreenVM {
   setTicketAmount = (amount: number) => (this.ticketAmount = amount);
 
   setIsLoading = (loading: boolean) => (this.isLoading = loading);
-
-  setError = (error: string | null) => (this.error = error);
 
   incrementTicketAmount = () => (this.ticketAmount += 1);
 
