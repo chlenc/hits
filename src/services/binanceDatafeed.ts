@@ -36,6 +36,33 @@ export default function BinanceDatafeed() {
       });
     },
 
+    searchSymbols: (
+      userInput: string,
+      exchange: string,
+      symbolType: string,
+      onResult: any
+    ) => {
+      // Простая реализация поиска символов
+      const symbols = [
+        {
+          symbol: "ETHUSDT",
+          full_name: "ETHUSDT",
+          description: "ETH / USDT",
+          exchange: "Binance",
+          ticker: "ETHUSDT",
+          type: "crypto",
+        },
+      ];
+
+      const filtered = symbols.filter(
+        (symbol) =>
+          symbol.symbol.toLowerCase().includes(userInput.toLowerCase()) ||
+          symbol.description.toLowerCase().includes(userInput.toLowerCase())
+      );
+
+      onResult(filtered);
+    },
+
     /** Исторические бары */
     getBars: async (
       _sym: any,

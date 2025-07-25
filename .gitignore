@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+public/datafeeds/
+public/charting_library/
+src/charting_library/
