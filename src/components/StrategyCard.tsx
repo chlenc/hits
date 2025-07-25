@@ -1,21 +1,21 @@
 import styled from "@emotion/styled";
+import BigNumber from "bignumber.js";
 import dayjs from "dayjs";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import ethIcon from "../assets/icons/eth.svg";
 import plusIcon from "../assets/icons/plus.svg";
 import starsIcon from "../assets/icons/stars.svg";
+import { TICKET_PRICE } from "../configs/networkConfig";
+import useCountdown from "../hooks/useCountdown";
 import type { Strategy } from "../services/api";
 import BN from "../utils/BN";
+import { BasicBadge, ProfitBadge, StatusBadge } from "./Badge";
 import Button from "./Button";
 import { Column, Row } from "./Flex";
-import PriceChart from "./PriceChart";
-import SizedBox from "./SizedBox";
-import { TICKET_PRICE } from "../configs/networkConfig";
-import BigNumber from "bignumber.js";
-import useCountdown from "../hooks/useCountdown";
-import { BasicBadge, ProfitBadge, StatusBadge } from "./Badge";
 import PriceChartTV from "./PriceChartTV";
+import SizedBox from "./SizedBox";
+import BinanceDatafeed from "../services/binanceDatafeed";
 
 // Типы пропсов
 export type StrategyCardProps = {
@@ -96,9 +96,35 @@ export const StrategyCard: React.FC<StrategyCardProps> = ({
     userIncomePct = userIncome.div(userDeposit).times(100);
   }
 
-  let isProfit = true;
-  if (strategy.status === "Expired") isProfit = pnl.gte(0);
+  const [lastPrice, setLastPrice] = React.useState(0);
+  const datafeed = BinanceDatafeed();
+  React.useEffect(() => {
+    const updateLastPrice = () =>
+      datafeed.getBars(
+        "ETHUSDT",
+        "1",
+        {
+          from: dayjs().subtract(60, "second").unix(),
+          to: dayjs().unix(),
+        },
+        (bars: any[]) =>
+          bars && bars.length > 0 && setLastPrice(bars[bars.length - 1].close),
+        (err: any) => console.error("Error fetching last minute candle:", err)
+      );
+    updateLastPrice();
+    const interval = setInterval(() => updateLastPrice(), 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
+  let isProfit = true;
+  if (strategy.status === "Active" && strategy.breakoutRange) {
+    const min = Number(strategy.breakoutRange.min);
+    const max = Number(strategy.breakoutRange.max);
+    if (lastPrice >= min && lastPrice <= max) {
+      isProfit = false;
+    }
+  }
+  if (strategy.status === "Expired") isProfit = pnl.gte(0);
   return (
     <Card status={strategy.status}>
       <Row alignItems="center">
@@ -194,7 +220,7 @@ export const StrategyCard: React.FC<StrategyCardProps> = ({
             from={dayjs(depositUntil).unix() * 1000}
           /> */}
           <PriceChartTV
-            lineColor={isProfit ? "#70EC9E" : "#ED5959"}
+            lineColor={isProfit ? "green" : "red"}
             upper={strategy.breakoutRange?.max}
             lower={strategy.breakoutRange?.min}
             to={dayjs(expiration).unix() * 1000}

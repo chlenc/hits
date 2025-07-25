@@ -38,8 +38,8 @@ export default function BinanceDatafeed() {
 
     searchSymbols: (
       userInput: string,
-      exchange: string,
-      symbolType: string,
+      _exchange: string,
+      _symbolType: string,
       onResult: any
     ) => {
       // Простая реализация поиска символов

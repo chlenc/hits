@@ -13,7 +13,7 @@ interface PriceChartProps {
   lower?: number;
   to: number;
   from: number;
-  lineColor?: string;
+  lineColor?: "green" | "red";
 }
 
 declare global {
@@ -23,14 +23,18 @@ declare global {
 }
 
 const PriceChartTV: React.FC<PriceChartProps> = observer(
-  ({ upper, lower, from, to, lineColor = "#19F096" }) => {
+  ({ upper, lower, from, to, lineColor = "green" }) => {
     const chartContainerRef = useRef<HTMLDivElement>(null);
 
-    const areaOverrides = {
-      "mainSeriesProperties.areaStyle.linecolor": lineColor,
+    const areaOverrides =  lineColor === "green" ? {
+      "mainSeriesProperties.areaStyle.linecolor": "#70EC9E",
       "mainSeriesProperties.areaStyle.color1": "rgba(25,240,150,0.25)", // полупрозрачный верх
       "mainSeriesProperties.areaStyle.color2": "rgba(25,240,150,0.00)", // полностью прозр. низ
-    };
+    }:{
+      "mainSeriesProperties.areaStyle.linecolor": "#ED5959",
+      "mainSeriesProperties.areaStyle.color1": "rgba(237,89,89,0.25)", // полупрозрачный верх
+      "mainSeriesProperties.areaStyle.color2": "rgba(237,89,89,0.00)", // полностью прозр. низ
+    }
 
     const overrides = {
       "paneProperties.background": "#000000",
