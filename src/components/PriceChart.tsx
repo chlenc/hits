@@ -4,14 +4,8 @@ import { observer } from "mobx-react-lite";
 import BinanceDatafeed from "../services/binanceDatafeed";
 import BN from "../utils/BN";
 
-interface ChartDataPoint {
-  timestamp: number;
-  value: number;
-}
-
 interface PriceChartProps {
   className?: string;
-  data?: ChartDataPoint[];
   upper?: number; // верхняя граница
   lower?: number; // нижняя граница
   to: number; // время окончания

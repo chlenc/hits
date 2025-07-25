@@ -13,12 +13,9 @@ const Strategies: React.FC = observer(() => {
   return (
     <PageContainer>
       <PageTitle>Select your strategy</PageTitle>
-      {strategiesStore.strategies
-        .slice()
-        .reverse()
-        .map((strategy) => (
-          <StrategyCard key={strategy.id} strategy={strategy} />
-        ))}
+      {strategiesStore.strategies.map((strategy) => (
+        <StrategyCard key={strategy.id} strategy={strategy} />
+      ))}
     </PageContainer>
   );
 });
