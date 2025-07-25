@@ -90,7 +90,7 @@ const StrategyItem = ({ strategy }: { strategy: Strategy }) => {
         </Value>
         {status === "Expired" ? (
           <Value color={userIncome! > 0 ? "#70EC9E" : "#ED5959"}>
-            {userIncome} {symbol}
+            +{userIncome} {symbol}
           </Value>
         ) : (
           <Value>In {activeUntil}</Value>

@@ -91,14 +91,13 @@ export const StrategyCard: React.FC<StrategyCardProps> = ({
   let userIncome = BN.ZERO;
   let userIncomePct = BN.ZERO;
   if (strategy.status === "Expired") {
-    userIncome = BN.formatUnits(strategy?.userIncome ?? 0, 18);
+    userIncome = new BN(strategy?.userIncome ?? 0);
     userIncomePct = userIncome.div(userDeposit).times(100);
   }
 
   let isProfit = true;
   if (strategy.status === "Expired") isProfit = pnl.gte(0);
 
-  // const income = strategy.income ?? 0;
   return (
     <Card status={strategy.status}>
       <Row alignItems="center">
@@ -170,7 +169,7 @@ export const StrategyCard: React.FC<StrategyCardProps> = ({
             <ValueTitle color="#70EC9E">
               {ticketsBalance.gt(0) &&
                 userIncome.gt(0) &&
-                userIncomePct.toSignificant(2).toFormat()}
+                `+${userIncomePct.toSignificant(2).toFormat()}%`}
             </ValueTitle>
           </Row>
         </>
