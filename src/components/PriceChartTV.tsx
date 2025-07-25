@@ -7,6 +7,7 @@ import type {
   ResolutionString,
 } from "../charting_library/charting_library";
 import BinanceDatafeed from "../services/binanceDatafeed";
+import dayjs from "dayjs";
 
 interface PriceChartProps {
   upper?: number;
@@ -26,15 +27,18 @@ const PriceChartTV: React.FC<PriceChartProps> = observer(
   ({ upper, lower, from, to, lineColor = "green" }) => {
     const chartContainerRef = useRef<HTMLDivElement>(null);
 
-    const areaOverrides =  lineColor === "green" ? {
-      "mainSeriesProperties.areaStyle.linecolor": "#70EC9E",
-      "mainSeriesProperties.areaStyle.color1": "rgba(25,240,150,0.25)", // полупрозрачный верх
-      "mainSeriesProperties.areaStyle.color2": "rgba(25,240,150,0.00)", // полностью прозр. низ
-    }:{
-      "mainSeriesProperties.areaStyle.linecolor": "#ED5959",
-      "mainSeriesProperties.areaStyle.color1": "rgba(237,89,89,0.25)", // полупрозрачный верх
-      "mainSeriesProperties.areaStyle.color2": "rgba(237,89,89,0.00)", // полностью прозр. низ
-    }
+    const areaOverrides =
+      lineColor === "green"
+        ? {
+            "mainSeriesProperties.areaStyle.linecolor": "#70EC9E",
+            "mainSeriesProperties.areaStyle.color1": "rgba(25,240,150,0.25)", // полупрозрачный верх
+            "mainSeriesProperties.areaStyle.color2": "rgba(25,240,150,0.00)", // полностью прозр. низ
+          }
+        : {
+            "mainSeriesProperties.areaStyle.linecolor": "#ED5959",
+            "mainSeriesProperties.areaStyle.color1": "rgba(237,89,89,0.25)", // полупрозрачный верх
+            "mainSeriesProperties.areaStyle.color2": "rgba(237,89,89,0.00)", // полностью прозр. низ
+          };
 
     const overrides = {
       "paneProperties.background": "#000000",
@@ -79,38 +83,71 @@ const PriceChartTV: React.FC<PriceChartProps> = observer(
         chart.setChartType(3);
         chart.applyOverrides(areaOverrides);
 
-        const base = {
-          shape: "horizontal_line",
-          color: lineColor,
-          disableSelection: true,
-          lock: true,
-          overrides: {
-            linecolor: "#2B2A2A", // сама линия
-            textcolor: "#2B2A2A", // подпись/прайс-лейбл
-            linewidth: 1, // толщина
-            // linestyle: 0,               // сплошная (0 = Solid, 1 = Dotted …)
-            showLabel: true, // подпись «Upper» можно скрыть
-          },
-        };
-        upper &&
-          chart.createShape(
-            { time: from, price: upper },
-            { text: `Upper: $${upper}`, ...base }
-          );
+        // const base = {
+        //   shape: "horizontal_line",
+        //   color: lineColor,
+        //   disableSelection: true,
+        //   lock: true,
+        //   overrides: {
+        //     linecolor: "#2B2A2A", // сама линия
+        //     textcolor: "#2B2A2A", // подпись/прайс-лейбл
+        //     linewidth: 1, // толщина
+        //     // linestyle: 0,               // сплошная (0 = Solid, 1 = Dotted …)
+        //     showLabel: true, // подпись «Upper» можно скрыть
+        //   },
+        // };
+        // upper &&
+        //   chart.createShape(
+        //     { time: from, price: upper },
+        //     { text: `Upper: $${upper}`, ...base }
+        //   );
 
-        lower &&
-          chart.createShape(
-            { time: from, price: lower },
-            { text: `Lower: ${lower}`, ...base }
-          );
+        // lower &&
+        //   chart.createShape(
+        //     { time: from, price: lower },
+        //     { text: `Lower: ${lower}`, ...base }
+        //   );
 
+        // base.shape = "vertical_line";
+        // chart.createShape(
+        //   { time: dayjs(to).unix(), price: upper },
+        //   { text: dayjs(to).format("D MMM, HH:mm"), ...base }
+        // );
+        // chart.createShape(
+        //   { time: dayjs(from).unix(), price: lower },
+        //   { text: dayjs(from).format("D MMM, HH:mm"), ...base }
+        // );
+
+        chart.createMultipointShape(
+          [
+            { time: dayjs(from).unix(), price: upper }, // левый-верх
+            { time: dayjs(to).unix(), price: lower }, // правый-низ
+          ],
+          {
+            shape: "rectangle",
+            filled: true,
+            lock: true,
+            disableSelection: true,
+            overrides: {
+              fillColor: "rgba(237,89,89,0.25)", // красная дымка внутри
+              color: "#ED5959", // контур
+              linewidth: 1,
+            },
+          }
+        );
+
+        const priceScale = chart.getPanes()[0].getRightPriceScales()[0];
         if (lower && upper) {
-          const priceScale = chart.getPanes()[0].getRightPriceScales()[0];
           priceScale.setAutoScale(false);
-          const from = lower * 0.99;
-          const to = upper * 1.01;
-          priceScale.setVisiblePriceRange({ from, to });
+          priceScale.setVisiblePriceRange({
+            from: lower * 0.95,
+            to: upper * 1.05,
+          });
         }
+        chart.setVisibleRange({
+          from: dayjs(from).unix() - 2000,
+          to: dayjs(to).unix() + 5000,
+        });
       });
 
       return () => {
