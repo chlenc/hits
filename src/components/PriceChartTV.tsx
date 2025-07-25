@@ -26,98 +26,86 @@ const PriceChartTV: React.FC<PriceChartProps> = observer(
   ({ upper, lower, from, to, lineColor = "#19F096" }) => {
     const chartContainerRef = useRef<HTMLDivElement>(null);
 
+    const areaOverrides = {
+      "mainSeriesProperties.areaStyle.linecolor": lineColor,
+      "mainSeriesProperties.areaStyle.color1": "rgba(25,240,150,0.25)", // полупрозрачный верх
+      "mainSeriesProperties.areaStyle.color2": "rgba(25,240,150,0.00)", // полностью прозр. низ
+    };
+
+    const overrides = {
+      "paneProperties.background": "#000000",
+      "paneProperties.backgroundType": "solid",
+      "paneProperties.vertGridProperties.color": "#000",
+      "paneProperties.horzGridProperties.color": "#000",
+      "paneProperties.crossHairProperties.color": "#4E4C51",
+      "mainSeriesProperties.lineStyle.color": lineColor,
+      "mainSeriesProperties.lineStyle.linewidth": 1,
+      "mainSeriesProperties.lineStyle.style": 0,
+      "scalesProperties.textColor": "#4E4C51",
+    };
+
     useEffect(() => {
       if (!window.TradingView || !chartContainerRef.current) return;
 
       const widgetOptions: ChartingLibraryWidgetOptions = {
         container: chartContainerRef.current,
         symbol: "ETHUSDT",
-        interval: "60" as ResolutionString,
+        interval: "1" as ResolutionString,
         datafeed: BinanceDatafeed(),
         library_path: "/charting_library/",
         autosize: true,
-        theme: "dark",
         locale: getLanguageFromURL() || "en",
-        disabled_features, //<---
+        theme: "dark",
+        disabled_features,
         enabled_features: [],
-        // timezone: "Etc/UTC",
-        overrides: {
-          "paneProperties.background": "#000000",
-          "paneProperties.backgroundType": "solid",
-          "paneProperties.vertGridProperties.color": "#2B2B43",
-          "paneProperties.horzGridProperties.color": "#2B2B43",
-          "paneProperties.crossHairProperties.color": "#9598A1",
-          "paneProperties.watermarkProperties.color": "#9598A1",
-          "paneProperties.watermarkProperties.fontSize": 24,
-          "paneProperties.watermarkProperties.fontFamily": "Roboto",
-          "paneProperties.watermarkProperties.text": "",
-          "symbolWatermarkProperties.color": "#9598A1",
-          "symbolWatermarkProperties.fontSize": 24,
-          "symbolWatermarkProperties.fontFamily": "Roboto",
-          "symbolWatermarkProperties.text": "",
-          "scalesProperties.backgroundColor": "#000000",
-          "scalesProperties.textColor": "#9598A1",
-          "scalesProperties.borderColor": "#2B2B43",
-          "scalesProperties.fontSize": 12,
-          "scalesProperties.fontFamily": "Roboto",
-          "mainSeriesProperties.candleStyle.upColor": "#26A69A",
-          "mainSeriesProperties.candleStyle.downColor": "#EF5350",
-          "mainSeriesProperties.candleStyle.borderUpColor": "#26A69A",
-          "mainSeriesProperties.candleStyle.borderDownColor": "#EF5350",
-          "mainSeriesProperties.candleStyle.wickUpColor": "#26A69A",
-          "mainSeriesProperties.candleStyle.wickDownColor": "#EF5350",
-        },
-        custom_css_url: "/charting_library/css/style.css",
+        overrides,
         loading_screen: {
           backgroundColor: "#000000",
         },
+        // chart_type: 3,
+        // timezone: "Etc/UTC",
+        // custom_css_url: "/charting_library/css/style.css",
       };
 
-      console.log("🔧 Widget options:", widgetOptions);
       const tvWidget = new window.TradingView.widget(widgetOptions);
 
       tvWidget.onChartReady(() => {
         const chart = tvWidget.activeChart();
         // const chart = tvWidget.chart();
-        console.log("✅ on chart ready");
+        chart.setChartType(3);
+        chart.applyOverrides(areaOverrides);
 
-        // Apply overrides programmatically as a fallback
-        try {
-          chart.applyOverrides({
-            "paneProperties.background": "#000000",
-            "paneProperties.backgroundType": "solid",
-            "paneProperties.vertGridProperties.color": "#2B2B43",
-            "paneProperties.horzGridProperties.color": "#2B2B43",
-          });
-          console.log("✅ Overrides applied programmatically");
-        } catch (error) {
-          console.error("❌ Failed to apply overrides:", error);
-        }
-
-        if (upper) {
+        const base = {
+          shape: "horizontal_line",
+          color: lineColor,
+          disableSelection: true,
+          lock: true,
+          overrides: {
+            linecolor: "#2B2A2A", // сама линия
+            textcolor: "#2B2A2A", // подпись/прайс-лейбл
+            linewidth: 1, // толщина
+            // linestyle: 0,               // сплошная (0 = Solid, 1 = Dotted …)
+            showLabel: true, // подпись «Upper» можно скрыть
+          },
+        };
+        upper &&
           chart.createShape(
             { time: from, price: upper },
-            {
-              shape: "horizontal_line",
-              text: "Upper",
-              color: lineColor,
-              disableSelection: true,
-              lock: true,
-            }
+            { text: `Upper: $${upper}`, ...base }
           );
-        }
 
-        if (lower) {
+        lower &&
           chart.createShape(
             { time: from, price: lower },
-            {
-              shape: "horizontal_line",
-              text: "Lower",
-              color: lineColor,
-              disableSelection: true,
-              lock: true,
-            }
+            { text: `Lower: ${lower}`, ...base }
           );
+
+        if (lower && upper) {
+          const priceScale = chart.getPanes()[0].getRightPriceScales()[0];
+          priceScale.setAutoScale(false);
+          const from = lower * 0.99;
+          const to = upper * 1.01;
+          priceScale.setVisiblePriceRange({ from, to });
         }
       });
 
@@ -127,7 +115,7 @@ const PriceChartTV: React.FC<PriceChartProps> = observer(
     }, [upper, lower, from, to, lineColor]);
 
     return (
-      <div style={{ height: 500, width: "100%" }}>
+      <div style={{ height: 250, width: "100%" }}>
         <div
           ref={chartContainerRef}
           className="TVChartContainer"
@@ -147,6 +135,7 @@ const getLanguageFromURL = (): LanguageCode | null => {
 };
 
 const disabled_features: ChartingLibraryFeatureset[] = [
+  "legend_widget",
   "left_toolbar",
   "header_widget",
   "volume_force_overlay",
