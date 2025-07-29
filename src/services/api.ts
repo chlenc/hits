@@ -1,4 +1,5 @@
 const API_BASE_URL = "https://api.hits4.fun";
+// const API_BASE_URL = "http://localhost:3000";
 
 export interface AuthMessageResponse {
   message: string;
@@ -77,6 +78,34 @@ export interface ReferralInfo {
 
 export interface ReferralInfoResponse {
   referralInfo: ReferralInfo;
+}
+export type PaymentStatus = 
+  | "waiting" 
+  | "confirming" 
+  | "confirmed" 
+  | "sending" 
+  | "partially_paid" 
+  | "finished" 
+  | "failed" 
+  | "refunded" 
+  | "expired";
+export interface Invoice {
+  id: string;
+  payAddress: string;
+  paymentStatus: PaymentStatus;
+  priceAmount: number;
+  payCurrency: string;
+  paymentId: string;
+  expirationEstimateDate: string;
+  redirectData?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateInvoiceRequest {
+  amount: number;
+  token: string;
+  network: string;
 }
 
 class ApiService {
@@ -164,6 +193,37 @@ class ApiService {
   // Compliance methods
   async getComplianceTrace(): Promise<{ access: boolean }> {
     return this.request<{ access: boolean }>("/compliance/trace");
+  }
+
+  async createInvoice(
+    signature: string,
+    address: string,
+    invoiceData: CreateInvoiceRequest,
+  ): Promise<Invoice> {
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${signature}`,
+      "x-address": address,
+      "Content-Type": "application/json",
+    };
+
+    return this.request<Invoice>("/invoices", {
+      method: "POST",
+      headers,
+      body: JSON.stringify(invoiceData),
+    });
+  }
+
+  async getInvoice(
+    signature: string,
+    address: string,
+    invoiceId: string
+  ): Promise<Invoice> {
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${signature}`,
+      "x-address": address,
+    };
+
+    return this.request<Invoice>(`/invoices/${invoiceId}`, { headers });
   }
 }
 

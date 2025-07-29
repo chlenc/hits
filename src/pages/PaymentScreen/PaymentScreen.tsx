@@ -96,18 +96,18 @@ const PaymentImpl: React.FC = observer(() => {
   const { sendTransactionAsync } = useSendTransaction();
   const config = useConfig();
 
-  const { accountStore, balanceStore, strategiesStore } = useStores();
+  const { accountStore, balanceStore, strategiesStore, invoiceStore } =
+    useStores();
   const paymentVM = usePaymentScreenVM();
 
   const strategy = paymentVM.openStrategy;
 
-  const [useCashback, _setUseCashback] = React.useState<boolean>(false);
+  const [useCashback] = React.useState<boolean>(false);
 
   const cashback = useCashback ? paymentVM.cashback : 0;
   const balance = paymentVM.ethBalance;
-  const price = new BN(paymentVM.ticketAmount * TICKET_PRICE - cashback)
-    .toSignificant(5)
-    .toFormat();
+  const price = new BN(paymentVM.ticketAmount * TICKET_PRICE - cashback);
+  const priceFormat = price.toSignificant(5).toFormat();
   const { startsIn } = useCountdown({ depositUntil: strategy?.depositUntil });
 
   if (strategiesStore.initialized && !strategy) {
@@ -117,7 +117,7 @@ const PaymentImpl: React.FC = observer(() => {
 
   const handleBuyTickets = async () => {
     // Check if user has enough balance
-    const requiredBalance = paymentVM.ticketAmount * TICKET_PRICE;
+    const requiredBalance = price.toNumber();
     const currentBalance = Number(balance);
 
     if (currentBalance < requiredBalance) {
@@ -138,9 +138,7 @@ const PaymentImpl: React.FC = observer(() => {
       // Send transaction using wagmi
       const hash = await sendTransactionAsync({
         to: contract as `0x${string}`,
-        value: BigInt(
-          (paymentVM.ticketAmount * TICKET_PRICE * 10 ** 18).toString()
-        ),
+        value: BigInt((price.toNumber() * 10 ** 18).toString()),
       });
 
       // Wait for transaction confirmation
@@ -168,6 +166,49 @@ const PaymentImpl: React.FC = observer(() => {
       toast.error(err instanceof Error ? err.message : "Failed to buy tickets");
     } finally {
       paymentVM.setIsLoading(false);
+    }
+  };
+
+  const handleBuyUsingInvoice = async () => {
+    /* 
+  SOLANA = "solana",
+  TRON = "tron",
+  TON = "ton",
+  CARD = "card",
+    */
+    /* 
+export enum Coins {
+  ETH = "ETH",
+  USDT = "USDT",
+  USDC = "USDC",
+  DAI = "DAI",
+  TRX = "TRX",
+  TON = "TON",
+  SOL = "SOL",
+  ROCKS = "ROCKS"
+}
+*/
+
+    const currentNetwork = "sol";
+    const asset = "usdc";
+    const ethPrice = balanceStore.prices.ETH;
+    const invoiceData = await invoiceStore.createInvoice(
+      price.times(ethPrice).toNumber(),
+      currentNetwork,
+      asset
+    );
+
+    if (!invoiceData) {
+      toast.error("Failed to create payment invoice");
+      return;
+    }
+
+    if (invoiceData.redirectData) {
+      // For card payments - open payment provider page
+      window.open(invoiceData.redirectData, "_blank");
+    } else {
+      // For crypto payments - show QR code modal
+      invoiceStore.openModal(invoiceData);
     }
   };
 
@@ -204,7 +245,7 @@ const PaymentImpl: React.FC = observer(() => {
           </StyledButton>
         </Row>
         <SizedBox height={16} />
-        <AmountText> {price} ETH</AmountText>
+        <AmountText> {priceFormat} ETH</AmountText>
         <SizedBox height={16} />
         <Row alignItems="center" justifyContent="center">
           <img src={walletIcon} alt="icon" width={12} />

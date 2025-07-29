@@ -101,8 +101,8 @@ class AccountStore {
   }
   get referralLink() {
     return this.rootStore.accountStore.address
-      ? `hits4.fun/?ref=${this.rootStore.accountStore.address.toLowerCase()}`
-      : "hits4.fun";
+      ? `app.hits4.fun/?ref=${this.rootStore.accountStore.address.toLowerCase()}`
+      : "app.hits4.fun";
   }
 
   async fetchTradingStats() {

@@ -142,21 +142,10 @@ The protocol is now in **Whitelist Phase**. Early participants who purchase tick
 
 This is your chance to bet early and double up later.
 
-## Roadmap
-
-| Phase         | Milestone                                             |
-|---------------|--------------------------------------------------------|
-| ✅ Now        | Site live, whitelist open, Base contracts deployed     |
-| ⏳ +1 week    | Full UI, strategy engine, referral dashboard           |
-| 🔜 +2 weeks   | Mainnet strategy launch, real ticket settlement        |
-| 🔁 +1 month   | Multichain rollout planning (TON, Mantle, Gaianet etc) |
-| 🧱 Q4         | Analytics, mobile app, multi-strategy support          |
-
 ## Links
 
 Website: [https://hits4.fun](https://hits4.fun)  
 Twitter: [https://twitter.com/hits4fun](https://twitter.com/hits4fun)  
 Telegram: [https://t.me/hits4fun](https://t.me/hits4fun)  
-Whitelist: [https://hits4.fun/whitelist](https://hits4.fun/whitelist)
 
 _This whitepaper is a living document and will be updated as the protocol evolves._
