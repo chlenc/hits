@@ -1,10 +1,14 @@
 export const NETWORKS = {
   BASE: "base",
-  // SEPOLIA: "sepolia",
+  SEPOLIA: "sepolia",
   // ETHEREUM = "ethereum",
   // POLYGON = "polygon",
   // BSC = "bsc",
   // ARBITRUM = "arbitrum",
+  SOLANA: "solana",
+  TRON: "tron",
+  TON: "ton",
+  CARD: "card",
 };
 
 export const TICKET_PRICE = 0.005;
@@ -14,6 +18,10 @@ export const COINS = {
   USDT: "USDT",
   USDC: "USDC",
   DAI: "DAI",
+  SOL: "SOL",
+  TRX: "TRX",
+  TON: "TON",
+  USD: "USD",
 } as const;
 
 type TokenConfig = {
@@ -26,6 +34,7 @@ type TokenConfig = {
 
 type NetworkConfig = {
   name: string;
+  title?: string;
   chainId: number;
   contract: `0x${string}`;
   rpc: string;
@@ -68,6 +77,7 @@ export const NetworkConfig: Record<string, NetworkConfig> = {
   //   ],
   // },
   base: {
+    title: "Base Mainnet",
     name: NETWORKS.BASE,
     chainId: 8453,
     contract: "0xd7d889Abe43D7C59cD33eD1d2bAa2EDe0b718762",
@@ -75,26 +85,26 @@ export const NetworkConfig: Record<string, NetworkConfig> = {
     explorer: "https://basescan.org",
     tokens: [
       {
-        symbol: COINS.USDT,
-        decimals: 6,
-        address: "0xA614E4c8E06a7F0719B6d95aBdcF9D4b46b16bcF",
-        priceFeed:
-          "0x2b89b9dc8fdf9f34709a5b106b472f0f39bb6ca9ce04b0fd7f2e971688e2e53b",
-      },
-      {
-        symbol: COINS.USDC,
-        decimals: 6,
-        address: "0xD9b312D77Bc7B2e29Ff8beE60a77A5f9E69E6cDC",
-        priceFeed:
-          "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
-      },
-      {
         symbol: COINS.ETH,
         decimals: 18,
         isNative: true,
         priceFeed:
           "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
       },
+      // {
+      //   symbol: COINS.USDT,
+      //   decimals: 6,
+      //   address: "0xA614E4c8E06a7F0719B6d95aBdcF9D4b46b16bcF",
+      //   priceFeed:
+      //     "0x2b89b9dc8fdf9f34709a5b106b472f0f39bb6ca9ce04b0fd7f2e971688e2e53b",
+      // },
+      // {
+      //   symbol: COINS.USDC,
+      //   decimals: 6,
+      //   address: "0xD9b312D77Bc7B2e29Ff8beE60a77A5f9E69E6cDC",
+      //   priceFeed:
+      //     "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
+      // },
     ],
   },
   // ethereum: {
@@ -187,4 +197,79 @@ export const NetworkConfig: Record<string, NetworkConfig> = {
   //     }
   // ]
   // },
+  solana: {
+    name: NETWORKS.SOLANA,
+    chainId: 0, // Solana doesn't use chainId
+    contract: "0x0000000000000000000000000000000000000000",
+    rpc: "https://api.mainnet-beta.solana.com",
+    explorer: "https://explorer.solana.com",
+    tokens: [
+      {
+        symbol: COINS.SOL,
+        decimals: 9,
+        isNative: true,
+      },
+      {
+        symbol: COINS.USDT,
+        decimals: 6,
+      },
+      {
+        symbol: COINS.USDC,
+        decimals: 6,
+      },
+    ],
+    title: "Solana Mainnet",
+  },
+  tron: {
+    name: NETWORKS.TRON,
+    chainId: 0, // Tron doesn't use chainId
+    contract: "0x0000000000000000000000000000000000000000",
+    rpc: "https://api.trongrid.io",
+    explorer: "https://tronscan.org",
+    tokens: [
+      {
+        symbol: COINS.TRX,
+        decimals: 6,
+        isNative: true,
+      },
+      {
+        symbol: COINS.USDT,
+        decimals: 6,
+      },
+    ],
+    title: "Tron Mainnet",
+  },
+  ton: {
+    name: NETWORKS.TON,
+    chainId: 0, // Ton doesn't use chainId
+    contract: "0x0000000000000000000000000000000000000000",
+    rpc: "https://toncenter.com/api/v2/jsonRPC",
+    explorer: "https://tonscan.org",
+    tokens: [
+      {
+        symbol: COINS.TON,
+        decimals: 9,
+        isNative: true,
+      },
+      {
+        symbol: COINS.USDT,
+        decimals: 6,
+      },
+    ],
+    title: "Ton Mainnet",
+  },
+  card: {
+    name: NETWORKS.CARD,
+    chainId: 0, // Not applicable
+    contract: "0x0000000000000000000000000000000000000000",
+    explorer: "",
+    rpc: "",
+    tokens: [
+      {
+        symbol: COINS.USD,
+        decimals: 2,
+      },
+    ],
+    title: "Visa/Mastercard",
+  },
 };

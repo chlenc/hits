@@ -18,12 +18,15 @@ import PageContainer from "../../components/PageContainer";
 import PageTitle from "../../components/PageTitle";
 import Section from "../../components/Section";
 import SizedBox from "../../components/SizedBox";
-import { TICKET_PRICE } from "../../configs/networkConfig";
+import { NetworkConfig, TICKET_PRICE } from "../../configs/networkConfig";
 import { useStores } from "../../stores/useStores";
 import BN from "../../utils/BN";
 import { PaymentScreenVMProvider, usePaymentScreenVM } from "./PaymentScreenVM";
 import useCountdown from "../../hooks/useCountdown";
 import { toast } from "react-toastify";
+import Select from "./temp/Select";
+import { COIN_ICONS, NETWORK_ICONS } from "../../configs/logoConfig";
+import InvoiceModal from "../../components/InvoiceModal";
 
 const SectionTitle = styled.h5`
   font-family: "Instrument Sans";
@@ -104,6 +107,22 @@ const PaymentImpl: React.FC = observer(() => {
 
   const [useCashback] = React.useState<boolean>(false);
 
+  const [selectedNetworkIndex, setSelectedNetworkIndex] = React.useState(0);
+  const [selectedTokenIndex, setSelectedTokenIndex] = React.useState(0);
+  const networksArray = Object.values(NetworkConfig).map((network) => ({
+    title: network.title ?? network.name,
+    key: network.name,
+    logo: NETWORK_ICONS[network.name],
+  }));
+
+  const tokensArray = NetworkConfig[
+    networksArray[selectedNetworkIndex].key
+  ].tokens.map((token) => ({
+    title: token.symbol,
+    key: token.symbol,
+    logo: COIN_ICONS[token.symbol],
+  }));
+
   const cashback = useCashback ? paymentVM.cashback : 0;
   const balance = paymentVM.ethBalance;
   const price = new BN(paymentVM.ticketAmount * TICKET_PRICE - cashback);
@@ -116,6 +135,11 @@ const PaymentImpl: React.FC = observer(() => {
   }
 
   const handleBuyTickets = async () => {
+    if (NetworkConfig[networksArray[selectedNetworkIndex].key].chainId === 0) {
+      handleBuyUsingInvoice();
+      return;
+    }
+
     // Check if user has enough balance
     const requiredBalance = price.toNumber();
     const currentBalance = Number(balance);
@@ -213,6 +237,9 @@ export enum Coins {
   };
 
   if (!strategiesStore.initialized) return <Loading />;
+  if (invoiceStore.isModalOpen && invoiceStore.invoiceData) {
+    return <InvoiceModal />;
+  }
 
   return (
     <PageContainer>
@@ -253,6 +280,28 @@ export enum Coins {
           <SecondaryText>
             Balance: {new BN(balance).toSignificant(4).toFormat()} ETH
           </SecondaryText>
+        </Row>
+        <SizedBox height={16} />
+        <Row>
+          <Select
+            style={{ flex: 2 }}
+            options={networksArray}
+            selected={networksArray[selectedNetworkIndex]}
+            onSelect={({ key }) => {
+              const index = networksArray.findIndex((o) => o.key === key);
+              setSelectedNetworkIndex(index);
+            }}
+          />
+          <SizedBox width={8} />
+          <Select
+            style={{ flex: 1 }}
+            options={tokensArray}
+            selected={tokensArray[selectedTokenIndex]}
+            onSelect={({ key }) => {
+              const index = tokensArray.findIndex((o) => o.key === key);
+              setSelectedTokenIndex(index);
+            }}
+          />
         </Row>
         <SizedBox height={16} />
         <SecondaryText color="#ED5959" align="center">

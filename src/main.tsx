@@ -41,9 +41,6 @@ createRoot(document.getElementById("root")!).render(
           >
             <storesContext.Provider value={mobxStore}>
               <WalletAuth />
-              {/* <SyncDataFromHook /> */}
-              {/* 👆 this component is responsible for syncing 
-              account data from wagmi hooks to mobx store */}
               <App />
               <ToastContainer />
             </storesContext.Provider>
