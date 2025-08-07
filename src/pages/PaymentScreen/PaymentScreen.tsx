@@ -96,7 +96,7 @@ const PaymentImpl: React.FC = observer(() => {
   const { sendTransactionAsync } = useSendTransaction();
   const config = useConfig();
 
-  const { accountStore, balanceStore, strategiesStore, invoiceStore } =
+  const { accountStore, balanceStore, strategiesStore } =
     useStores();
   const paymentVM = usePaymentScreenVM();
 
@@ -166,49 +166,6 @@ const PaymentImpl: React.FC = observer(() => {
       toast.error(err instanceof Error ? err.message : "Failed to buy tickets");
     } finally {
       paymentVM.setIsLoading(false);
-    }
-  };
-
-  const handleBuyUsingInvoice = async () => {
-    /* 
-  SOLANA = "solana",
-  TRON = "tron",
-  TON = "ton",
-  CARD = "card",
-    */
-    /* 
-export enum Coins {
-  ETH = "ETH",
-  USDT = "USDT",
-  USDC = "USDC",
-  DAI = "DAI",
-  TRX = "TRX",
-  TON = "TON",
-  SOL = "SOL",
-  ROCKS = "ROCKS"
-}
-*/
-
-    const currentNetwork = "sol";
-    const asset = "usdc";
-    const ethPrice = balanceStore.prices.ETH;
-    const invoiceData = await invoiceStore.createInvoice(
-      price.times(ethPrice).toNumber(),
-      currentNetwork,
-      asset
-    );
-
-    if (!invoiceData) {
-      toast.error("Failed to create payment invoice");
-      return;
-    }
-
-    if (invoiceData.redirectData) {
-      // For card payments - open payment provider page
-      window.open(invoiceData.redirectData, "_blank");
-    } else {
-      // For crypto payments - show QR code modal
-      invoiceStore.openModal(invoiceData);
     }
   };
 

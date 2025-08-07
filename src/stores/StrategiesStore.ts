@@ -12,6 +12,9 @@ class StrategiesStore {
     makeAutoObservable(this);
 
     this.fetchStrategies();
+    setInterval(() => {
+      this.fetchStrategies();
+    }, 60 * 1000);
   }
 
   async fetchStrategies() {

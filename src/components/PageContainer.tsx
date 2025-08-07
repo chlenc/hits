@@ -16,11 +16,19 @@ const PageContainerRoot = styled.div`
   box-sizing: border-box;
 `;
 
-const PageContainer = ({ children, style }: { children: React.ReactNode, style?: React.CSSProperties }) => {
+const PageContainer = ({
+  children,
+  style,
+}: {
+  children: React.ReactNode;
+  style?: React.CSSProperties;
+}) => {
   return (
     <PageContainerRoot style={style}>
       <Row justifyContent="space-between" alignItems="center">
-        <img src={logoIcon} alt="logo" height={32} />
+        <a href="https://hits4.fun" target="_blank" rel="noopener noreferrer">
+          <img src={logoIcon} alt="logo" height={32} />
+        </a>
         <ConnectButton
           showBalance={true}
           accountStatus="avatar"

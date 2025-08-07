@@ -66,6 +66,11 @@ class AccountStore {
       { fireImmediately: true }
     );
 
+    setInterval(() => {
+      this.fetchTradingStats();
+      this.rootStore.strategiesStore.fetchStrategies();
+    }, 60 * 1000);
+
     // console.log({
     //   initState: initState?.referrer,
     //   signatures: JSON.stringify(this.signatures),
