@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import Modal from "./Modal";
+import { useState } from "react";
 import onboarding1 from "../assets/onboarding/1.webp";
 import onboarding2 from "../assets/onboarding/2.webp";
 import onboarding3 from "../assets/onboarding/3.webp";
 import onboarding4 from "../assets/onboarding/4.webp";
 import onboarding5 from "../assets/onboarding/5.webp";
+import Modal from "./Modal";
 // import onboarding6 from "../assets/onboarding/6.webp";
-import onboarding7 from "../assets/onboarding/7.webp";
 import { observer } from "mobx-react-lite";
+import onboarding7 from "../assets/onboarding/7.webp";
 import { useStores } from "../stores/useStores";
 
 interface OnboardingStep {

@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import React from "react";
 import copyIcon from "../../assets/icons/copy.svg";
 import Button from "../../components/Button";
-import { Column, Row } from "../../components/Flex";
+import { Row } from "../../components/Flex";
 import Input from "../../components/Input";
 import Section from "../../components/Section";
 import SizedBox from "../../components/SizedBox";
