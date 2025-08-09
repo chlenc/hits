@@ -7,13 +7,12 @@ import { useNavigate } from "react-router-dom";
 const RegionLockModal = observer(() => {
   const { accountStore } = useStores();
   const navigate = useNavigate();
-  if (!accountStore.isCompliance) {
+  if (!accountStore.access) {
     return null;
   }
-
   return (
     <Modal
-      open={true}
+      open={!accountStore.access}
       onOpenChange={() => navigate("/trades")}
       image={regionLockImage}
       title="Not available in your region"

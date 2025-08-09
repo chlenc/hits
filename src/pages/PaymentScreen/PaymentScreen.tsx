@@ -269,7 +269,7 @@ const PaymentImpl: React.FC = observer(() => {
         {/* {accountStore.isConnected ? (
           <Button
             onClick={handleBuyTickets}
-            disabled={paymentVM.isLoading || !accountStore.isCompliance}
+            disabled={paymentVM.isLoading || !accountStore.access}
           >
             {paymentVM.isLoading
               ? "Processing..."
@@ -289,7 +289,7 @@ const PaymentImpl: React.FC = observer(() => {
             disabled={
               (strategy?.userDeposit ?? 0) > 0 ||
               paymentVM.isLoading ||
-              !accountStore.isCompliance
+              !accountStore.access
             }
           >
             {paymentVM.isLoading

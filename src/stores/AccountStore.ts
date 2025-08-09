@@ -40,7 +40,7 @@ class AccountStore {
   isLoading: boolean = false;
 
   // Compliance state
-  isCompliance: boolean = false;
+  access: boolean = false;
 
   constructor(rootStore: RootStore, initState?: IAccountStoreInitState) {
     this.rootStore = rootStore;
@@ -81,7 +81,7 @@ class AccountStore {
     //   referrer: this.referrer,
     // });
     apiService.getComplianceTrace().then((res) => {
-      this.isCompliance = res.access;
+      this.access = res.access;
     });
   }
 

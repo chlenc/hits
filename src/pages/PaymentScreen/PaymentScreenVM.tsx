@@ -30,7 +30,7 @@ class PaymentScreenVM {
   }
 
   get isComplianceError(): string | null {
-    if (!this.rootStore.accountStore.isCompliance) {
+    if (!this.rootStore.accountStore.access) {
       return "You are not compliant with the KYC/AML regulations";
     }
     return null;
