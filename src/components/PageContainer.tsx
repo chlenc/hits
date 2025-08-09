@@ -1,7 +1,8 @@
 import styled from "@emotion/styled";
-import { Row } from "./Flex";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import React from "react";
 import logoIcon from "../assets/icons/logo.svg";
+import { Row } from "./Flex";
 
 const PageContainerRoot = styled.div`
   display: flex;
@@ -16,6 +17,13 @@ const PageContainerRoot = styled.div`
   box-sizing: border-box;
 `;
 
+const ContentWrapper = styled.div`
+  box-sizing: border-box;
+  gap: 16px;
+  display: flex;
+  flex-direction: column;
+`;
+
 const PageContainer = ({
   children,
   style,
@@ -24,7 +32,7 @@ const PageContainer = ({
   style?: React.CSSProperties;
 }) => {
   return (
-    <PageContainerRoot style={style}>
+    <PageContainerRoot>
       <Row justifyContent="space-between" alignItems="center">
         <a href="https://hits4.fun" target="_blank" rel="noopener noreferrer">
           <img src={logoIcon} alt="logo" height={32} />
@@ -35,7 +43,7 @@ const PageContainer = ({
           chainStatus="icon"
         />
       </Row>
-      {children}
+      <ContentWrapper style={style}>{children}</ContentWrapper>
     </PageContainerRoot>
   );
 };

@@ -79,15 +79,15 @@ export interface ReferralInfo {
 export interface ReferralInfoResponse {
   referralInfo: ReferralInfo;
 }
-export type PaymentStatus = 
-  | "waiting" 
-  | "confirming" 
-  | "confirmed" 
-  | "sending" 
-  | "partially_paid" 
-  | "finished" 
-  | "failed" 
-  | "refunded" 
+export type PaymentStatus =
+  | "waiting"
+  | "confirming"
+  | "confirmed"
+  | "sending"
+  | "partially_paid"
+  | "finished"
+  | "failed"
+  | "refunded"
   | "expired";
 export interface Invoice {
   id: string;
@@ -180,6 +180,23 @@ class ApiService {
     return this.request<TradingStatsResponse>("/trading/stats", { headers });
   }
 
+  // Demo Trading methods
+  async demoDeposit(
+    signature: string,
+    address: string
+  ): Promise<{ success: boolean }> {
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${signature}`,
+      "x-address": address,
+      "Content-Type": "application/json",
+    };
+
+    return this.request<{ success: boolean }>("/trading/deposits", {
+      method: "POST",
+      headers,
+    });
+  }
+
   async getStrategies(
     signature?: string,
     address?: string
@@ -198,7 +215,7 @@ class ApiService {
   async createInvoice(
     signature: string,
     address: string,
-    invoiceData: CreateInvoiceRequest,
+    invoiceData: CreateInvoiceRequest
   ): Promise<Invoice> {
     const headers: Record<string, string> = {
       Authorization: `Bearer ${signature}`,

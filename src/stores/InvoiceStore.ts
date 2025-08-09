@@ -17,7 +17,7 @@ class InvoiceStore {
   isModalOpen: boolean = false;
   invoiceData: InvoiceData | null = null;
 
-  private statusCheckInterval: number | null = null;
+  private statusCheckInterval: NodeJS.Timeout | null = null;
 
   constructor(rootStore: RootStore, initialState?: ISerializedInvoiceStore) {
     this.rootStore = rootStore;

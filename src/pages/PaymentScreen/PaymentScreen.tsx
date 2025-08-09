@@ -7,9 +7,9 @@ import { useNavigate } from "react-router-dom";
 import { useConfig, useSendTransaction } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import arrowIcon from "../../assets/icons/arrow.svg";
-import walletIcon from "../../assets/icons/wallet.svg";
-import minusIcon from "../../assets/icons/minus.svg";
-import plusIcon from "../../assets/icons/plus.svg";
+// import walletIcon from "../../assets/icons/wallet.svg";
+// import minusIcon from "../../assets/icons/minus.svg";
+// import plusIcon from "../../assets/icons/plus.svg";
 import tickerPicture from "../../assets/images/ticketPreview.webp";
 import Button from "../../components/Button";
 import { Row } from "../../components/Flex";
@@ -24,6 +24,8 @@ import BN from "../../utils/BN";
 import { PaymentScreenVMProvider, usePaymentScreenVM } from "./PaymentScreenVM";
 import useCountdown from "../../hooks/useCountdown";
 import { toast } from "react-toastify";
+import { apiService } from "../../services/api";
+import RegionLockModal from "../../components/RegionLockModal";
 
 const SectionTitle = styled.h5`
   font-family: "Instrument Sans";
@@ -85,10 +87,10 @@ const SecondaryText = styled.div<{
   letter-spacing: -0.12px;
 `;
 
-const StyledButton = styled(Button)`
-  border-radius: 48px;
-  width: 48px;
-`;
+// const StyledButton = styled(Button)`
+//   border-radius: 48px;
+//   width: 48px;
+// `;
 
 const PaymentImpl: React.FC = observer(() => {
   const navigate = useNavigate();
@@ -96,8 +98,7 @@ const PaymentImpl: React.FC = observer(() => {
   const { sendTransactionAsync } = useSendTransaction();
   const config = useConfig();
 
-  const { accountStore, balanceStore, strategiesStore } =
-    useStores();
+  const { accountStore, balanceStore, strategiesStore } = useStores();
   const paymentVM = usePaymentScreenVM();
 
   const strategy = paymentVM.openStrategy;
@@ -107,13 +108,49 @@ const PaymentImpl: React.FC = observer(() => {
   const cashback = useCashback ? paymentVM.cashback : 0;
   const balance = paymentVM.ethBalance;
   const price = new BN(paymentVM.ticketAmount * TICKET_PRICE - cashback);
-  const priceFormat = price.toSignificant(5).toFormat();
+  // const priceFormat = price.toSignificant(5).toFormat();
   const { startsIn } = useCountdown({ depositUntil: strategy?.depositUntil });
 
   if (strategiesStore.initialized && !strategy) {
     navigate("/strategies");
     return;
   }
+
+  const handleBuyDemoTickets = async () => {
+    paymentVM.setIsLoading(true);
+
+    try {
+      const { networkConfig, address } = accountStore;
+      if (!networkConfig || !address || !accountStore.signature) {
+        throw new Error("Network config or address not available");
+      }
+
+      const response = await apiService.demoDeposit(
+        accountStore.signature,
+        address
+      );
+
+      if (response.success) {
+        // Update balances after successful transaction
+        await Promise.all([
+          balanceStore.updateTokenBalances(),
+          strategiesStore.fetchStrategies(),
+          accountStore.fetchTradingStats(),
+        ]);
+      }
+
+      // Reset ticket amount after initiating purchase
+      paymentVM.setTicketAmount(1);
+
+      navigate("/strategies");
+      toast.success("Tickets bought successfully");
+    } catch (err) {
+      console.error("Error buying tickets:", err);
+      toast.error(err instanceof Error ? err.message : "Failed to buy tickets");
+    } finally {
+      paymentVM.setIsLoading(false);
+    }
+  };
 
   const handleBuyTickets = async () => {
     // Check if user has enough balance
@@ -173,13 +210,7 @@ const PaymentImpl: React.FC = observer(() => {
 
   return (
     <PageContainer>
-      {/* <Row justifyContent="flex-end" alignItems="center">
-        <ConnectButton
-          showBalance={true}
-          accountStatus="avatar"
-          chainStatus="icon"
-        />
-      </Row> */}
+      <RegionLockModal />
       <PageTitle>ETH breaks the range?</PageTitle>
       <SubTitle>
         {dayjs(strategy?.depositUntil).format("D MMM, HH:mm")} —{" "}
@@ -189,31 +220,36 @@ const PaymentImpl: React.FC = observer(() => {
         <SectionTitle>Buy tickets</SectionTitle>
         <SizedBox height={24} />
         <Row
-          justifyContent="space-between"
+          // justifyContent="space-between"
+          justifyContent="center"
           mainAxisSize="stretch"
           alignItems="center"
         >
-          <StyledButton secondary onClick={paymentVM.decrementTicketAmount}>
+          {/* <StyledButton secondary onClick={paymentVM.decrementTicketAmount}>
             <img src={minusIcon} alt="minus" />
-          </StyledButton>
+          </StyledButton> */}
           <img src={tickerPicture} alt="ticket" style={{ maxWidth: "186px" }} />
-          <StyledButton secondary onClick={paymentVM.incrementTicketAmount}>
+          {/* <StyledButton secondary onClick={paymentVM.incrementTicketAmount}>
             <img src={plusIcon} alt="plus" />
-          </StyledButton>
+          </StyledButton> */}
         </Row>
         <SizedBox height={16} />
-        <AmountText> {priceFormat} ETH</AmountText>
-        <SizedBox height={16} />
+        <AmountText style={{ color: "#70EC9E" }}>FREE</AmountText>
+        {/* <AmountText> {priceFormat} ETH</AmountText> */}
+        {/* <SizedBox height={16} />
         <Row alignItems="center" justifyContent="center">
           <img src={walletIcon} alt="icon" width={12} />
           &nbsp;
           <SecondaryText>
             Balance: {new BN(balance).toSignificant(4).toFormat()} ETH
           </SecondaryText>
-        </Row>
-        <SizedBox height={16} />
+        </Row> */}
+        {/* <SizedBox height={16} />
         <SecondaryText color="#ED5959" align="center">
           This app is in beta testing. Use at your own risk.
+        </SecondaryText> */}
+        <SecondaryText color="#70EC9E" align="center" style={{ marginTop: 0 }}>
+          during demo trading
         </SecondaryText>
         {/* <SizedBox height={24} />
         <Row alignItems="center" justifyContent="space-between">
@@ -230,20 +266,46 @@ const PaymentImpl: React.FC = observer(() => {
             <SizedBox height={16} />
           </>
         )}
-        {accountStore.isConnected ? (
+        {/* {accountStore.isConnected ? (
           <Button
             onClick={handleBuyTickets}
             disabled={paymentVM.isLoading || !accountStore.isCompliance}
           >
             {paymentVM.isLoading
               ? "Processing..."
-              : `Buy ${paymentVM.ticketAmount} tickets`}{" "}
+              : `Join for ${paymentVM.ticketAmount} ticket${
+                  paymentVM.ticketAmount === 1 ? "" : "s"
+                }`}
             &nbsp;
             {!paymentVM.isLoading && <img src={arrowIcon} alt="arrowIcon" />}
           </Button>
         ) : (
           <Button onClick={modal?.openConnectModal}>Connect wallet</Button>
+        )} */}
+        {/* DEMO MODE 👆*/}
+        {accountStore.isConnected ? (
+          <Button
+            onClick={handleBuyDemoTickets ?? handleBuyTickets}
+            disabled={
+              (strategy?.userDeposit ?? 0) > 0 ||
+              paymentVM.isLoading ||
+              !accountStore.isCompliance
+            }
+          >
+            {paymentVM.isLoading
+              ? "Processing..."
+              : (strategy?.userDeposit ?? 0) > 0
+              ? "You already joined"
+              : `Join for 1 ticket`}
+            &nbsp;
+            {!paymentVM.isLoading && (strategy?.userDeposit ?? 0) === 0 && (
+              <img src={arrowIcon} alt="arrowIcon" />
+            )}
+          </Button>
+        ) : (
+          <Button onClick={modal?.openConnectModal}>Connect wallet</Button>
         )}
+        {/* DEMO MODE 👆*/}
         <SizedBox height={16} />
         <PrimaryText
           style={{ cursor: "pointer", padding: "8px", textAlign: "center" }}

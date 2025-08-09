@@ -4,6 +4,7 @@ import HomeIcon from "./assets/icons/home.svg";
 import InfoIcon from "./assets/icons/info.svg";
 import TargetIcon from "./assets/icons/target.svg";
 import BottomNav from "./components/BottomNav";
+import OnboardingModal from "./components/OnboardingModal";
 import About from "./pages/About";
 import MainScreen from "./pages/MainScreen";
 import PaymentScreen from "./pages/PaymentScreen";
@@ -44,6 +45,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/strategies" replace />} />
       </Routes>
       <BottomNav active={active} />
+      <OnboardingModal />
     </Wrapper>
   );
 }

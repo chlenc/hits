@@ -39,7 +39,7 @@ const Referrals: React.FC = observer(() => {
 
   return (
     <>
-      <Section>
+      <Section style={{ marginTop: 16 }}>
         <SectionTitle>My referral link</SectionTitle>
         <SizedBox height={24} />
         <Input value={accountStore.referralLink ?? ""} readOnly />
@@ -48,13 +48,19 @@ const Referrals: React.FC = observer(() => {
           Copy link &nbsp; <img src={copyIcon} alt="copy" />
         </Button>
         {accountStore.userData?.referrer != null && (
-          <SecondaryText align="center" style={{ marginTop: 16 }}>
+          <SecondaryText align="center" style={{ marginTop: 24 }}>
             Your referer {centerEllipsis(accountStore.userData?.referrer)}
           </SecondaryText>
         )}
+        {accountStore.refferals.length > 0 && (
+          <Row justifyContent="space-between" style={{ marginTop: 24 }}>
+            <SectionTitle>My referrals</SectionTitle>
+            <SectionTitle>{accountStore.refferals.length}</SectionTitle>
+          </Row>
+        )}
       </Section>
-      {accountStore.refferals.length > 0 && (
-        <Section>
+      {/* {accountStore.refferals.length > 0 && (
+        <Section style={{ marginTop: 16 }}>
           <SectionTitle>My referrals</SectionTitle>
           <SizedBox height={24} />
           <Column gap={16} crossAxisSize="max">
@@ -63,18 +69,18 @@ const Referrals: React.FC = observer(() => {
                 <SecondaryText>
                   {index + 1}. {centerEllipsis(referral.address)}
                 </SecondaryText>
-                {/* <SecondaryText align="right">
-                +{referral.reward} SOL
-              </SecondaryText> */}
+                <SecondaryText align="right">
+                  +{referral.reward} SOL
+                </SecondaryText>
               </Row>
             ))}
           </Column>
-          {/* <SizedBox height={24} />
-        <Button secondary>
-          Claim all &nbsp; <img src={starsIcon} alt="stars" />
-        </Button> */}
+          <SizedBox height={24} />
+          <Button secondary>
+            Claim all &nbsp; <img src={starsIcon} alt="stars" />
+          </Button>
         </Section>
-      )}
+      )} */}
     </>
   );
 });

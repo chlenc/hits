@@ -118,8 +118,10 @@ const MainScreen: React.FC = observer(() => {
           </Section>
         )} */}
       </Column>
-      <PageTitle>Referrals</PageTitle>
-      <Referrals />
+      <Column crossAxisSize="max">
+        <PageTitle>Referrals</PageTitle>
+        <Referrals />
+      </Column>
       <SizedBox height={32} />
     </PageContainer>
   );

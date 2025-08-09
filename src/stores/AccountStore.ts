@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 export interface IAccountStoreInitState {
   referrer?: string;
   signatures?: Record<string, string>;
+  onboardingCompleted?: boolean;
 }
 
 class AccountStore {
@@ -22,6 +23,7 @@ class AccountStore {
   isProcessing: boolean = false;
   chainId: number | null = null;
   wagmiConfig: Config | null = null;
+  onboardingCompleted: boolean = false;
 
   isAuthenticating: boolean = false;
   signatures: Record<string, string> = {};
@@ -47,6 +49,7 @@ class AccountStore {
     if (initState != null) {
       this.referrer = initState.referrer;
       this.signatures = initState.signatures ?? {};
+      this.onboardingCompleted = initState.onboardingCompleted ?? false;
     }
 
     const referralFromURL = extractReferralFromURL();
@@ -82,6 +85,7 @@ class AccountStore {
     });
   }
 
+  
   setAddress = (address?: `0x${string}`) => (this.address = address);
   setIsConnected = (isConnected: boolean) => (this.isConnected = isConnected);
   setChainId = (chainId: number | null) => (this.chainId = chainId);
@@ -89,7 +93,8 @@ class AccountStore {
   setTradingStats = (stats: TradingStatsResponse) =>
     (this.tradingStats = stats);
   setLoading = (loading: boolean) => (this.isLoading = loading);
-
+  setOnboardingCompleted = (completed: boolean) => (this.onboardingCompleted = completed);
+  
   // Метод для вызова аутентификации из компонента с wagmi хуком
   triggerAuthentication = (walletClient?: any) => {
     if (this.isConnected && this.address && !this.isAuthenticating) {
@@ -106,13 +111,19 @@ class AccountStore {
   }
   get referralLink() {
     return this.rootStore.accountStore.address
-      ? `app.hits4.fun/?ref=${this.rootStore.accountStore.address.toLowerCase()}`
-      : "app.hits4.fun";
+      ? `https://app.hits4.fun/?ref=${this.rootStore.accountStore.address.toLowerCase()}`
+      : "https://app.hits4.fun";
+  }
+
+  get signature() {
+    return this.address && this.signatures[this.address]
+      ? this.signatures[this.address]
+      : null;
   }
 
   async fetchTradingStats() {
     const { address } = this;
-    if (!address || !this.signatures[address]) {
+    if (!address || !this.signature) {
       console.warn("Cannot fetch trading stats: no address or signature");
       return;
     }
@@ -120,7 +131,7 @@ class AccountStore {
     this.setLoading(true);
     try {
       const stats = await apiService.getTradingStats(
-        this.signatures[address],
+        this.signature,
         address
       );
       console.log({ stats });
@@ -148,7 +159,7 @@ class AccountStore {
 
     try {
       const { message } = await apiService.getAuthMessage();
-      let signature = this.signatures[address];
+      let signature = this.signature;
       if (!signature) {
         if (!walletClient) {
           console.error("No wallet client provided");
@@ -204,6 +215,7 @@ class AccountStore {
     return {
       referrer: this.referrer,
       signatures: this.signatures,
+      onboardingCompleted: this.onboardingCompleted,
     };
   };
 }

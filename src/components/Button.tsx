@@ -22,6 +22,12 @@ const Button = styled.button<{secondary?: boolean}>`
   width: 100%;
   box-sizing: border-box;
   color: #fff;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #4E4C51;
+  }
 `;
 
 export default Button;

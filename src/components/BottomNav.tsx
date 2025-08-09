@@ -2,6 +2,8 @@ import React from "react";
 import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
 import { screens } from "../App";
+import DemoTrading from "./DemoTrading";
+import { Row } from "./Flex";
 
 const activeColor = "#D67EF7";
 const inactiveColor = "#797A87";
@@ -20,7 +22,7 @@ const BottomNavWrapper = styled.div`
 
 const BottomNavInner = styled.div`
   width: 100%;
-  padding: 0 16px 32px 16px;
+  padding: 0 16px 16px 16px;
   box-sizing: border-box;
   pointer-events: all;
 `;
@@ -86,6 +88,9 @@ export const BottomNav: React.FC<{ active?: string }> = ({ active }) => {
             );
           })}
         </Nav>
+        <Row alignItems="center" justifyContent="center">
+          <DemoTrading style={{ paddingTop: 8, marginBottom: -8 }} />
+        </Row>
       </BottomNavInner>
     </BottomNavWrapper>
   );
