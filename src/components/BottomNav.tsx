@@ -89,7 +89,7 @@ export const BottomNav: React.FC<{ active?: string }> = ({ active }) => {
           })}
         </Nav>
         <Row alignItems="center" justifyContent="center">
-          <DemoTrading style={{ paddingTop: 8, marginBottom: -8 }} />
+          <DemoTrading style={{ paddingTop: 8 }} />
         </Row>
       </BottomNavInner>
     </BottomNavWrapper>
