@@ -65,7 +65,7 @@ const PriceChartTV: React.FC<PriceChartProps> = observer(
         locale: getLanguageFromURL() || "en",
         theme: "dark",
         disabled_features,
-        enabled_features: [],
+        enabled_features: ['iframe_loading_compatibility_mode'],
         overrides,
         loading_screen: {
           backgroundColor: "#000000",
