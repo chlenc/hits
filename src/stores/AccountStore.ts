@@ -111,8 +111,8 @@ class AccountStore {
   }
   get referralLink() {
     return this.rootStore.accountStore.address
-      ? `https://app.hits4.fun/?ref=${this.rootStore.accountStore.address.toLowerCase()}`
-      : "https://app.hits4.fun";
+      ? `https://hits4.fun/?ref=${this.rootStore.accountStore.address.toLowerCase()}`
+      : "https://hits4.fun";
   }
 
   get signature() {
@@ -170,6 +170,7 @@ class AccountStore {
           message,
           account: address,
         });
+        console.log({ signed });
         runInAction(() => {
           this.signatures[address] = signed;
         });

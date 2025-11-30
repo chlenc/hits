@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
 import dayjs from "dayjs";
 import { observer } from "mobx-react-lite";
 import React from "react";
@@ -26,6 +25,7 @@ import useCountdown from "../../hooks/useCountdown";
 import { toast } from "react-toastify";
 import { apiService } from "../../services/api";
 import RegionLockModal from "../../components/RegionLockModal";
+import { useAppKit } from "@reown/appkit/react";
 
 const SectionTitle = styled.h5`
   font-family: "Instrument Sans";
@@ -94,7 +94,7 @@ const SecondaryText = styled.div<{
 
 const PaymentImpl: React.FC = observer(() => {
   const navigate = useNavigate();
-  const modal = useConnectModal();
+  const { open: openConnectModal } = useAppKit();
   const { sendTransactionAsync } = useSendTransaction();
   const config = useConfig();
 
@@ -303,7 +303,7 @@ const PaymentImpl: React.FC = observer(() => {
             )}
           </Button>
         ) : (
-          <Button onClick={modal?.openConnectModal}>Connect wallet</Button>
+          <Button onClick={() => openConnectModal()}>Connect wallet</Button>
         )}
         {/* DEMO MODE 👆*/}
         <SizedBox height={16} />

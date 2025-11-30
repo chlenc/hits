@@ -1,8 +1,8 @@
 import styled from "@emotion/styled";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import React from "react";
 import logoIcon from "../assets/icons/logo.svg";
 import { Row } from "./Flex";
+import WalletConnectButton from "./WalletConnectButton";
 
 const PageContainerRoot = styled.div`
   display: flex;
@@ -37,11 +37,7 @@ const PageContainer = ({
         <a href="https://hits4.fun" target="_blank" rel="noopener noreferrer">
           <img src={logoIcon} alt="logo" height={32} />
         </a>
-        <ConnectButton
-          showBalance={true}
-          accountStatus="avatar"
-          chainStatus="icon"
-        />
+        <WalletConnectButton />
       </Row>
       <ContentWrapper style={style}>{children}</ContentWrapper>
     </PageContainerRoot>

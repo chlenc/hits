@@ -18,9 +18,10 @@
     "@ethersproject/bignumber": "^5.8.0",
     "@pythnetwork/hermes-client": "^2.0.0",
     "@radix-ui/react-dialog": "^1.1.14",
-    "@rainbow-me/rainbowkit": "^2.2.8",
     "@tanstack/react-query": "^5.81.2",
-    "@wagmi/core": "^2.17.3",
+    "@reown/appkit": "^1.8.1",
+    "@reown/appkit-adapter-wagmi": "^1.8.1",
+    "@wagmi/core": "^2.22.1",
     "bignumber.js": "^9.3.0",
     "dayjs": "^1.11.13",
     "framer-motion": "^12.23.12",
@@ -34,8 +35,8 @@
     "react-toastify": "^11.0.5",
     "rehype-raw": "^7.0.0",
     "tsdef": "^0.0.14",
-    "viem": "^2.31.4",
-    "wagmi": "^2.15.6"
+    "viem": "^2.39.0",
+    "wagmi": "^2.19.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

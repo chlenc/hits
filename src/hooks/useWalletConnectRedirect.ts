@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useNavigate } from "react-router-dom";
 import { useStores } from "../stores/useStores";
+import { useAppKit, useAppKitState } from "@reown/appkit/react";
 
 interface UseWalletConnectRedirectOptions {
   redirectPath?: string;
@@ -13,8 +13,9 @@ export const useWalletConnectRedirect = (
 ) => {
   const { redirectPath = "/strategies", autoOpenModal = true } = options;
   const { accountStore } = useStores();
-  const { openConnectModal, connectModalOpen } = useConnectModal();
   const navigate = useNavigate();
+  const { open: openConnectModal } = useAppKit();
+  const { open: connectModalOpen } = useAppKitState();
   const [wasModalOpened, setWasModalOpened] = useState(false);
 
   // Проверяем подключение кошелька при загрузке компонента

@@ -1,5 +1,5 @@
-const API_BASE_URL = "https://api.hits4.fun";
-// const API_BASE_URL = "http://localhost:3000";
+// const API_BASE_URL = "https://api.hits4.fun";
+const API_BASE_URL = "http://localhost:3000";
 
 export interface AuthMessageResponse {
   message: string;
@@ -145,7 +145,7 @@ class ApiService {
       Authorization: `Bearer ${signature}`,
       "x-address": address,
     };
-
+    console.log({ headers });
     if (referrer) {
       headers["x-referrer"] = referrer;
     }
